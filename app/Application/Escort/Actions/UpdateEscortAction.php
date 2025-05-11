@@ -1,10 +1,11 @@
 <?php
-namespace App\Application\Escort\Commands;
+
+namespace App\Application\Escort\Actions;
 
 use App\Application\Escort\DTOs\EscortData;
 
 // Lệnh cập nhật Escort
-class UpdateEscortCommand
+class UpdateEscortAction
 {
     public int $id;
     public EscortData $escortData;

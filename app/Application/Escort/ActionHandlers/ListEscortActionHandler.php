@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Application\Escort\QueryHandlers;
+namespace App\Application\Escort\ActionHandlers;
 
-use App\Application\Escort\Queries\ListEscortsQuery;
+use App\Application\Escort\Actions\ListEscortAction;
 use App\Application\Escort\DTOs\EscortData;
 use App\Domain\Escort\Repositories\EscortRepositoryInterface;
 
-class ListEscortsQueryHandler
+class ListEscortActionHandler
 {
     private EscortRepositoryInterface $escortRepository;
 
@@ -15,10 +15,9 @@ class ListEscortsQueryHandler
         $this->escortRepository = $escortRepository;
     }
 
-    // Xử lý truy vấn liệt kê Escort có phân trang
-    public function handle(ListEscortsQuery $query): array
+    public function handle(ListEscortAction $action): array
     {
-        $results = $this->escortRepository->paginate($query->perPage, $query->page);
+        $results = $this->escortRepository->paginate($action->perPage, $action->page);
         $dtos = [];
         foreach ($results as $escort) {
             $dtos[] = new EscortData(

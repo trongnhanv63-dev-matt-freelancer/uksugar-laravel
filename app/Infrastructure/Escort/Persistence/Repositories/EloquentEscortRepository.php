@@ -2,21 +2,19 @@
 
 namespace App\Infrastructure\Escort\Persistence\Repositories;
 
-use App\Domain\Escort\Entities\Escort;
+use App\Domain\Escort\Entities\EscortEntity;
 use App\Domain\Escort\Repositories\EscortRepositoryInterface;
 use App\Infrastructure\Escort\Persistence\Eloquent\EscortModel;
 
 class EloquentEscortRepository implements EscortRepositoryInterface
 {
-    // Tìm Escort theo ID
-    public function findById(int $id): ?Escort
+    public function findById(int $id): ?EscortEntity
     {
         $model = EscortModel::find($id);
         if (!$model) {
             return null;
         }
-        // Chuyển đổi từ model sang entity
-        return new Escort(
+        return new EscortEntity(
             $model->id,
             $model->name,
             $model->description,
@@ -27,8 +25,7 @@ class EloquentEscortRepository implements EscortRepositoryInterface
         );
     }
 
-    // Lưu (tạo hoặc cập nhật) Escort
-    public function save(Escort $escort): Escort
+    public function save(EscortEntity $escort): EscortEntity
     {
         if ($escort->getId()) {
             // Cập nhật
@@ -52,13 +49,11 @@ class EloquentEscortRepository implements EscortRepositoryInterface
 
         $model->save();
 
-        // Cập nhật ID (nếu cần) và trả về entity
         $escort->setId($model->id);
         return $escort;
     }
 
-    // Xóa Escort
-    public function delete(Escort $escort): void
+    public function delete(EscortEntity $escort): void
     {
         $model = EscortModel::find($escort->getId());
         if ($model) {
@@ -66,14 +61,13 @@ class EloquentEscortRepository implements EscortRepositoryInterface
         }
     }
 
-    // Phân trang
     public function paginate(int $perPage, int $page): array
     {
         $offset = ($page - 1) * $perPage;
         $models = EscortModel::skip($offset)->take($perPage)->get();
         $result = [];
         foreach ($models as $model) {
-            $result[] = new Escort(
+            $result[] = new EscortEntity(
                 $model->id,
                 $model->name,
                 $model->description,

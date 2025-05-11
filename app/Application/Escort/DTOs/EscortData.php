@@ -15,7 +15,7 @@ class EscortData
 
     public function __construct(
         string $name,
-        ?string $description,
+        ?string $description = null,
         ?string $image = null,
         ?EscortStatus $status = EscortStatus::Public,
         ?int $created_by = null,

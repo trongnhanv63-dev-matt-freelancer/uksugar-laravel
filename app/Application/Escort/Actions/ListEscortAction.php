@@ -1,8 +1,7 @@
 <?php
-namespace App\Application\Escort\Queries;
+namespace App\Application\Escort\Actions;
 
-// Truy vấn liệt kê Escort theo trang
-class ListEscortsQuery
+class ListEscortAction
 {
     public int $perPage;
     public int $page;

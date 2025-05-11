@@ -1,10 +1,10 @@
 <?php
-namespace App\Application\Escort\CommandHandlers;
+namespace App\Application\Escort\ActionHandlers;
 
-use App\Application\Escort\Commands\DeleteEscortCommand;
+use App\Application\Escort\Actions\DeleteEscortAction;
 use App\Domain\Escort\Repositories\EscortRepositoryInterface;
 
-class DeleteEscortCommandHandler
+class DeleteEscortActionHandler
 {
     private EscortRepositoryInterface $escortRepository;
 
@@ -13,13 +13,11 @@ class DeleteEscortCommandHandler
         $this->escortRepository = $escortRepository;
     }
 
-    // Xử lý lệnh xóa Escort
-    public function handle(DeleteEscortCommand $command): void
+    public function handle(DeleteEscortAction $Action): void
     {
-        $escort = $this->escortRepository->findById($command->id);
+        $escort = $this->escortRepository->findById($Action->id);
         if ($escort !== null) {
             $this->escortRepository->delete($escort);
         }
-        // Nếu không tìm thấy, có thể ném exception hoặc bỏ qua
     }
 }

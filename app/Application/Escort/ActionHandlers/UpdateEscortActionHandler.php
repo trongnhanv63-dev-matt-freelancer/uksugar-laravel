@@ -1,11 +1,11 @@
 <?php
-namespace App\Application\Escort\CommandHandlers;
+namespace App\Application\Escort\ActionHandlers;
 
-use App\Application\Escort\Commands\UpdateEscortCommand;
+use App\Application\Escort\Actions\UpdateEscortAction;
 use App\Domain\Escort\Entities\Escort;
 use App\Domain\Escort\Repositories\EscortRepositoryInterface;
 
-class UpdateEscortCommandHandler
+class UpdateEscortActionHandler
 {
     private EscortRepositoryInterface $escortRepository;
 
@@ -14,23 +14,18 @@ class UpdateEscortCommandHandler
         $this->escortRepository = $escortRepository;
     }
 
-    // Xử lý lệnh cập nhật Escort
-    public function handle(UpdateEscortCommand $command): ?Escort
+    public function handle(UpdateEscortAction $action): ?Escort
     {
-        // Tìm Escort hiện tại
-        $escort = $this->escortRepository->findById($command->id);
+        $escort = $this->escortRepository->findById($action->id);
         if ($escort === null) {
-            // Có thể ném exception hoặc xử lý khác nếu không tìm thấy
             return null;
         }
-        // Cập nhật thông tin từ DTO
-        $data = $command->escortData;
+        $data = $action->escortData;
         $escort->setName($data->name);
         $escort->setDescription($data->description);
         $escort->setImage($data->image);
         $escort->setStatus($data->status);
         $escort->setUpdatedBy($data->updated_by);
-        // Lưu thay đổi
         return $this->escortRepository->save($escort);
     }
 }

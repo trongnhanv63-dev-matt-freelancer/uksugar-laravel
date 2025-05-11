@@ -1,10 +1,9 @@
 <?php
-namespace App\Application\Escort\Commands;
+namespace App\Application\Escort\Actions;
 
 use App\Application\Escort\DTOs\EscortData;
 
-// Lệnh tạo Escort mới
-class CreateEscortCommand
+class CreateEscortAction
 {
     public EscortData $escortData;
 

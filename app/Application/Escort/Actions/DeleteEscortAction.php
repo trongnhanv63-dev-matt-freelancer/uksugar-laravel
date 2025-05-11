@@ -1,8 +1,7 @@
 <?php
-namespace App\Application\Escort\Commands;
+namespace App\Application\Escort\Actions;
 
-// Lệnh xóa Escort theo ID
-class DeleteEscortCommand
+class DeleteEscortAction
 {
     public int $id;
 

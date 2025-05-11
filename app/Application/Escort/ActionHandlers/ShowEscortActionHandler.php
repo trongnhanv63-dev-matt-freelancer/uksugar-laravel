@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Application\Escort\QueryHandlers;
+namespace App\Application\Escort\ActionHandlers;
 
-use App\Application\Escort\Queries\GetEscortByIdQuery;
+use App\Application\Escort\Actions\ShowEscortAction;
 use App\Application\Escort\DTOs\EscortData;
 use App\Domain\Escort\Repositories\EscortRepositoryInterface;
 
-class GetEscortByIdQueryHandler
+class ShowEscortActionHandler
 {
     private EscortRepositoryInterface $escortRepository;
 
@@ -15,14 +15,12 @@ class GetEscortByIdQueryHandler
         $this->escortRepository = $escortRepository;
     }
 
-    // Xử lý truy vấn lấy Escort theo ID
-    public function handle(GetEscortByIdQuery $query): ?EscortData
+    public function handle(ShowEscortAction $action): ?EscortData
     {
-        $escort = $this->escortRepository->findById($query->id);
+        $escort = $this->escortRepository->findById($action->id);
         if ($escort === null) {
             return null;
         }
-        // Chuyển đổi từ Entity Escort sang DTO EscortData
         return new EscortData(
             $escort->getName(),
             $escort->getDescription(),

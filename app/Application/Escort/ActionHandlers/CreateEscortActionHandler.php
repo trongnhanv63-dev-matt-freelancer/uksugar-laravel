@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Application\Escort\CommandHandlers;
+namespace App\Application\Escort\ActionHandlers;
 
-use App\Application\Escort\Commands\CreateEscortCommand;
-use App\Domain\Escort\Entities\Escort;
+use App\Application\Escort\Actions\CreateEscortAction;
+use App\Domain\Escort\Entities\EscortEntity;
 use App\Domain\Escort\Repositories\EscortRepositoryInterface;
 
-class CreateEscortCommandHandler
+class CreateEscortActionHandler
 {
     private EscortRepositoryInterface $escortRepository;
 
@@ -15,12 +15,10 @@ class CreateEscortCommandHandler
         $this->escortRepository = $escortRepository;
     }
 
-    // Xử lý lệnh tạo Escort
-    public function handle(CreateEscortCommand $command): Escort
+    public function handle(CreateEscortAction $action): EscortEntity
     {
-        $data = $command->escortData;
-        // Tạo entity Escort (giả sử Domain\Entity có constructor phù hợp)
-        $escort = new Escort(
+        $data = $action->escortData;
+        $escort = new EscortEntity(
             null,
             $data->name,
             $data->description,
@@ -29,7 +27,6 @@ class CreateEscortCommandHandler
             $data->created_by,
             $data->updated_by
         );
-        // Lưu và trả về Escort đã lưu
         return $this->escortRepository->save($escort);
     }
 }

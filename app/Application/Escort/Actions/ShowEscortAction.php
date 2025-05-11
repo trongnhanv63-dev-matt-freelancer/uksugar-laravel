@@ -1,8 +1,7 @@
 <?php
-namespace App\Application\Escort\Queries;
+namespace App\Application\Escort\Actions;
 
-// Truy vấn lấy Escort theo ID
-class GetEscortByIdQuery
+class ShowEscortAction
 {
     public int $id;
 
