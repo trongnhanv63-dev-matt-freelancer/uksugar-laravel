@@ -18,17 +18,8 @@ class ListEscortActionHandler
     public function handle(ListEscortAction $action): array
     {
         $results = $this->escortRepository->paginate($action->perPage, $action->page);
-        $dtos = [];
-        foreach ($results as $escort) {
-            $dtos[] = new EscortData(
-                $escort->getName(),
-                $escort->getDescription(),
-                $escort->getImage(),
-                $escort->getStatus(),
-                $escort->getCreatedBy(),
-                $escort->getUpdatedBy()
-            );
-        }
-        return $dtos;
+        return array_map(function($entity){
+            return $entity->toArray();
+        }, $results);
     }
 }

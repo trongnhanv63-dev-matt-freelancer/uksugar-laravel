@@ -58,7 +58,7 @@ class EscortApiController
             $request->input('description')
         ));
         $createdEscort = $this->createActionHandler->handle($action);
-        return response()->json($createdEscort, 201);
+        return response()->json($createdEscort->toArray(), 201);
     }
 
     /**
