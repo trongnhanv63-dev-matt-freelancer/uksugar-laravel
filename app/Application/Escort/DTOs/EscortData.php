@@ -3,6 +3,7 @@
 namespace App\Application\Escort\DTOs;
 
 use App\Domain\Escort\ValueObjects\EscortStatus;
+use DateTime;
 
 class EscortData
 {
@@ -12,6 +13,8 @@ class EscortData
     public ?EscortStatus $status;
     public ?int $created_by;
     public ?int $updated_by;
+    public ?DateTime $created_at;
+    public ?DateTime $updated_at;
 
     public function __construct(
         string $name,
@@ -20,6 +23,8 @@ class EscortData
         ?EscortStatus $status = EscortStatus::Public,
         ?int $created_by = null,
         ?int $updated_by = null,
+        ?DateTime $created_at = null,
+        ?DateTime $updated_at = null
     ) {
         $this->name = $name;
         $this->description = $description;
@@ -27,5 +32,7 @@ class EscortData
         $this->status = $status;
         $this->created_by = $created_by;
         $this->updated_by = $updated_by;
+        $this->created_at = $created_at;
+        $this->updated_at = $updated_at;
     }
 }

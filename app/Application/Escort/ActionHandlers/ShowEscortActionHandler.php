@@ -27,7 +27,9 @@ class ShowEscortActionHandler
             $escort->getImage(),
             $escort->getStatus(),
             $escort->getCreatedBy(),
-            $escort->getUpdatedBy()
+            $escort->getUpdatedBy(),
+            $escort->getCreatedAt(),
+            $escort->getUpdatedAt()
         );
     }
 }

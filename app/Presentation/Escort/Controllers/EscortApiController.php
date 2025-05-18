@@ -14,21 +14,33 @@ use App\Application\Escort\Actions\ListEscortAction;
 use App\Application\Escort\Actions\ShowEscortAction;
 use App\Application\Escort\Actions\UpdateEscortAction;
 use App\Application\Escort\DTOs\EscortData;
+use App\Http\Helpers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class EscortApiController
 {
+    protected ListEscortActionHandler $listActionHandler;
+    protected ShowEscortActionHandler $showActionHandler;
+    protected CreateEscortActionHandler $createActionHandler;
+    protected UpdateEscortActionHandler $updateActionHandler;
+    protected DeleteEscortActionHandler $deleteActionHandler;
     /**
      * Sử dụng Dependency Injection để nhận các Command/Query Handler.
      */
     public function __construct(
-        protected ListEscortActionHandler $listActionHandler,
-        protected ShowEscortActionHandler $showActionHandler,
-        protected CreateEscortActionHandler $createActionHandler,
-        protected UpdateEscortActionHandler $updateActionHandler,
-        protected DeleteEscortActionHandler $deleteActionHandler
-    ) {}
+        ListEscortActionHandler $listActionHandler,
+        ShowEscortActionHandler $showActionHandler,
+        CreateEscortActionHandler $createActionHandler,
+        UpdateEscortActionHandler $updateActionHandler,
+        DeleteEscortActionHandler $deleteActionHandler
+    ) {
+        $this->listActionHandler = $listActionHandler;
+        $this->showActionHandler = $showActionHandler;
+        $this->createActionHandler = $createActionHandler;
+        $this->updateActionHandler = $updateActionHandler;
+        $this->deleteActionHandler = $deleteActionHandler;
+    }
 
     /**
      * GET /api/escorts
@@ -53,10 +65,14 @@ class EscortApiController
      */
     public function store(Request $request): JsonResponse
     {
-        $action = new CreateEscortAction(new EscortData(
+        $data = new EscortData(
             $request->input('name'),
-            $request->input('description')
-        ));
+            $request->input('description'),
+            $request->file('image')
+        );
+        $data->created_at = Helpers::getDateWithTimezone(now());
+        $data->updated_at = $data->created_at;
+        $action = new CreateEscortAction($data);
         $createdEscort = $this->createActionHandler->handle($action);
         return response()->json($createdEscort->toArray(), 201);
     }
@@ -66,13 +82,12 @@ class EscortApiController
      */
     public function update(Request $request, int $id): JsonResponse
     {
-        $command = new UpdateEscortAction(
-            $id,
-            new EscortData(
-                $request->input('name'),
-                $request->input('description')
-            )
+        $data = new EscortData(
+            $request->input('name'),
+            $request->input('description')
         );
+        $data->updated_at = Helpers::getDateWithTimezone(now());
+        $command = new UpdateEscortAction($id, $data);
         $updatedEscort = $this->updateActionHandler->handle($command);
         return response()->json($updatedEscort, 200);
     }

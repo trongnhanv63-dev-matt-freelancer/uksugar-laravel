@@ -5,6 +5,7 @@ namespace App\Application\Escort\ActionHandlers;
 use App\Application\Escort\Actions\CreateEscortAction;
 use App\Domain\Escort\Entities\EscortEntity;
 use App\Domain\Escort\Repositories\EscortRepositoryInterface;
+use Http\Helpers;
 
 class CreateEscortActionHandler
 {
@@ -25,7 +26,9 @@ class CreateEscortActionHandler
             $data->image,
             $data->status,
             $data->created_by,
-            $data->updated_by
+            $data->updated_by,
+            $data->created_at,
+            $data->updated_at
         );
         return $this->escortRepository->save($escort);
     }

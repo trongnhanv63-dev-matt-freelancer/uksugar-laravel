@@ -73,6 +73,8 @@ class EloquentEscortRepository implements EscortRepositoryInterface
         $model->status = $escort->getStatus();
         $model->created_by = $escort->getCreatedBy();
         $model->updated_by = $escort->getUpdatedBy();
+        $model->created_at = $escort->getCreatedAt();
+        $model->updated_at = $escort->getUpdatedAt();
         return $model;
     }
 }

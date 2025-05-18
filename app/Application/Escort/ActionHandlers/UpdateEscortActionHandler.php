@@ -2,7 +2,7 @@
 namespace App\Application\Escort\ActionHandlers;
 
 use App\Application\Escort\Actions\UpdateEscortAction;
-use App\Domain\Escort\Entities\Escort;
+use App\Domain\Escort\Entities\EscortEntity;
 use App\Domain\Escort\Repositories\EscortRepositoryInterface;
 
 class UpdateEscortActionHandler
@@ -14,7 +14,7 @@ class UpdateEscortActionHandler
         $this->escortRepository = $escortRepository;
     }
 
-    public function handle(UpdateEscortAction $action): ?Escort
+    public function handle(UpdateEscortAction $action): ?EscortEntity
     {
         $escort = $this->escortRepository->findById($action->id);
         if ($escort === null) {
@@ -26,6 +26,7 @@ class UpdateEscortActionHandler
         $escort->setImage($data->image);
         $escort->setStatus($data->status);
         $escort->setUpdatedBy($data->updated_by);
+        $escort->setUpdatedAt($data->updated_at);
         return $this->escortRepository->save($escort);
     }
 }

@@ -39,13 +39,33 @@ class EscortEntity
         $this->updatedAt = $updatedAt;
     }
 
-    public function toArray() : array{
+    public function toArray(): array
+    {
         return get_object_vars($this);
     }
 
     public function setId(int $id): void
     {
         $this->id = $id;
+    }
+
+    public function setName(string $name)
+    {
+        $this->name = $name;
+    }
+    public function setDescription(string $description)
+    {
+        $this->description = $description;
+    }
+
+    public function setImage(?string $image)
+    {
+        $this->image = $image;
+    }
+
+    public function setStatus(EscortStatus $status)
+    {
+        $this->status = $status;
     }
 
     public function setCreatedAt(\DateTime $createdAt): void
@@ -56,6 +76,11 @@ class EscortEntity
     public function setUpdatedAt(\DateTime $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
+    }
+
+    public function setUpdatedBy(?int $updatedBy)
+    {
+        $this->updatedBy = $updatedBy;
     }
 
     public function getId(): ?int
