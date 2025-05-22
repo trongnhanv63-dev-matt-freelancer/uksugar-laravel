@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Application\Escort\ActionHandlers;
 
 use App\Application\Escort\Actions\UpdateEscortAction;
