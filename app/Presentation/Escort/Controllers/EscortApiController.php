@@ -70,8 +70,6 @@ class EscortApiController
             $request->input('description'),
             $request->file('image')
         );
-        $data->created_at = Helpers::getDateWithTimezone(now());
-        $data->updated_at = $data->created_at;
         $action = new CreateEscortAction($data);
         $createdEscort = $this->createActionHandler->handle($action);
         return response()->json($createdEscort->toArray(), 201);
@@ -86,7 +84,6 @@ class EscortApiController
             $request->input('name'),
             $request->input('description')
         );
-        $data->updated_at = Helpers::getDateWithTimezone(now());
         $command = new UpdateEscortAction($id, $data);
         $updatedEscort = $this->updateActionHandler->handle($command);
         return response()->json($updatedEscort, 200);

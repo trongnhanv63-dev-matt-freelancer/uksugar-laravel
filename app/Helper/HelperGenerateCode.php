@@ -626,9 +626,7 @@ class HelperGenerateCode
         $methodContent .= $paramString . "): JsonResponse" . PHP_EOL . "\t{" . PHP_EOL;
 
         if ($includeData) {
-            $methodContent .= "\t\t\$data = new {$name}Data();" . PHP_EOL .
-                "\t\t\$data->created_at = Helpers::getDateWithTimezone(now());" . PHP_EOL .
-                "\t\t\$data->updated_at = \$data->created_at;" . PHP_EOL;
+            $methodContent .= "\t\t\$data = new {$name}Data();" . PHP_EOL ;
         }
         $actionTypeCamel = $this->toCamelCase($actionType);
 
@@ -779,7 +777,7 @@ class HelperGenerateCode
             "{" . PHP_EOL .
             "\tpublic function up(): void" . PHP_EOL .
             "\t{" . PHP_EOL .
-            "\t\tif (!Schema::hasTable('product')) {" . PHP_EOL .
+            "\t\tif (!Schema::hasTable('{$name}')) {" . PHP_EOL .
             "\t\t\tSchema::create('{$name}', function (Blueprint \$table) {" . PHP_EOL .
             "\t\t\t\t\$table->id();" . PHP_EOL .
             "\t\t\t\t\$table->unsignedBigInteger('created_by')->nullable();" . PHP_EOL .
