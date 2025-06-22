@@ -4,12 +4,12 @@
 
 $finder = PhpCsFixer\Finder::create()
     ->in([
-        __DIR__ . '/../app',
-        __DIR__ . '/../config',
-        __DIR__ . '/../database/factories',
-        __DIR__ . '/../database/seeders',
-        __DIR__ . '/../routes',
-        __DIR__ . '/../tests',
+        __DIR__ . '/../../app',
+        __DIR__ . '/../../config',
+        __DIR__ . '/../../database/factories',
+        __DIR__ . '/../../database/seeders',
+        __DIR__ . '/../../routes',
+        __DIR__ . '/../../tests',
     ]);
 
 $config = new PhpCsFixer\Config();
@@ -22,7 +22,7 @@ return $config->setRules([
         'single_blank_line_at_eof' => true,
         'trailing_comma_in_multiline' => ['elements' => ['arrays']],
         'binary_operator_spaces' => ['default' => 'single_space'],
-        
+
         // Corrected rule name for enforcing single quotes.
         'single_quote' => true,
     ])

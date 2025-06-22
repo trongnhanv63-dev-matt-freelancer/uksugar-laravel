@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\StatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,6 +15,14 @@ class Role extends Model
         'name',
         'display_name',
         'description',
+        'status',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'status' => StatusEnum::class, // Cast the status attribute to our enum
     ];
 
     /**

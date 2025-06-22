@@ -1,5 +1,7 @@
 @extends('admin.layouts.app')
 
+@use(App\Enums\StatusEnum)
+
 @section('title', 'Manage Permissions')
 
 @section('content')
@@ -22,7 +24,8 @@
             <tr>
                 <th>Slug (Used in Code)</th>
                 <th>Description</th>
-                <th width="15%">Actions</th>
+                <th>Status</th>
+                <th width="20%">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -30,28 +33,34 @@
                 <tr>
                     <td><code>{{ $permission->slug }}</code></td>
                     <td>{{ $permission->description }}</td>
+                    <td>
+                        <span style="color: {{ $permission->status === StatusEnum::Active ? 'green' : 'red' }}">
+                            ● {{ ucfirst($permission->status->value) }}
+                        </span>
+                    </td>
                     <td class="action-links">
                         <a href="{{ route('admin.permissions.edit', $permission->id) }}">Edit</a>
                         <form
                             method="POST"
-                            action="{{ route('admin.permissions.destroy', $permission->id) }}"
+                            action="{{ route('admin.permissions.toggleStatus', $permission->id) }}"
                             style="display: inline"
-                            onsubmit="return confirm('Are you sure? This cannot be undone.');"
+                            onsubmit="return confirm('Are you sure you want to change this permission\'s status?');"
                         >
                             @csrf
-                            @method('DELETE')
+                            @method('PATCH')
                             <button
                                 type="submit"
                                 class="delete-btn"
+                                style="color: {{ $permission->status === StatusEnum::Active ? 'orange' : 'green' }}"
                             >
-                                Delete
+                                {{ $permission->status === StatusEnum::Active ? 'Deactivate' : 'Activate' }}
                             </button>
                         </form>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="3">No permissions found.</td>
+                    <td colspan="4">No permissions found. You can create them or run the seeder.</td>
                 </tr>
             @endforelse
         </tbody>

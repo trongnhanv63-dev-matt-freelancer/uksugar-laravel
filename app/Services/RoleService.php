@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
+use App\Enums\StatusEnum;
 use App\Models\Role;
-use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Repositories\Contracts\PermissionRepositoryInterface;
+use App\Repositories\Contracts\RoleRepositoryInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -54,12 +55,18 @@ class RoleService
         return $role;
     }
 
-    public function deleteRole(int $roleId): bool
+    public function toggleRoleStatus(int $roleId): Role
     {
         $role = $this->roleRepository->findById($roleId);
+
         if ($role->name === 'super-admin') {
-            throw new Exception('The Super Admin role cannot be deleted.');
+            throw new Exception('The Super Admin role status cannot be changed.');
         }
-        return $this->roleRepository->delete($roleId);
+
+        // Use the enum for comparison and assignment
+        $newStatus = $role->status === StatusEnum::Active ? StatusEnum::Inactive : StatusEnum::Active;
+        $this->roleRepository->update($roleId, ['status' => $newStatus]);
+
+        return $role->fresh(); // Return the updated model
     }
 }

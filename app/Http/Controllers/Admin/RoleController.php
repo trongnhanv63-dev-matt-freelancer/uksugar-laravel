@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Services\RoleService;
+use Exception;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Illuminate\Http\RedirectResponse;
-use Exception;
 
 class RoleController extends Controller
 {
@@ -66,11 +66,11 @@ class RoleController extends Controller
                          ->with('success', 'Role updated successfully.');
     }
 
-    public function destroy(Role $role): RedirectResponse
+    public function toggleStatus(Role $role): RedirectResponse
     {
         try {
-            $this->roleService->deleteRole($role->id);
-            return redirect()->route('admin.roles.index')->with('success', 'Role deleted successfully.');
+            $this->roleService->toggleRoleStatus($role->id);
+            return redirect()->route('admin.roles.index')->with('success', 'Role status updated successfully.');
         } catch (Exception $e) {
             return redirect()->route('admin.roles.index')->with('error', $e->getMessage());
         }
