@@ -8,7 +8,11 @@
     </div>
 
     <div class="content-body">
-        <p>Welcome back, <strong>{{ auth()->user()->username }}</strong>!</p>
+        <p>
+            Welcome back,
+            <strong>{{ auth()->user()->username }}</strong>
+            !
+        </p>
         <p>From here, you can manage the application's roles, permissions, users, and other settings.</p>
         <p>Use the navigation menu on the left to get started.</p>
     </div>
