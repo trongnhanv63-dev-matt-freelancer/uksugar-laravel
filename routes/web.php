@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController as PublicLoginController;
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Middleware\EnsureUserHasRole; // Import the middleware class
 
 /*
@@ -33,6 +34,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
 
         Route::resource('roles', RoleController::class);
+
+        Route::resource('permissions', PermissionController::class)->except(['show']);
+
     });
 });
 
