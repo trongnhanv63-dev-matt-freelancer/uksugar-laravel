@@ -39,17 +39,14 @@ class LoginController extends Controller
         $isAuthenticated = $this->authService->attemptLogin($credentials, $remember);
 
         if ($isAuthenticated) {
-            // --- CRITICAL STEP: Check if the logged-in user is an admin ---
             if (auth()->user()->hasRole('super-admin')) {
                 $request->session()->regenerate();
                 return redirect()->intended(route('admin.dashboard'));
             }
 
-            // If a normal user tries to log in via the admin form, log them out and reject.
             Auth::logout();
         }
 
-        // If login fails or user is not an admin, redirect back with an error.
         return back()->withErrors([
             'email' => 'These credentials are not valid for an administrator.',
         ])->onlyInput('email');

@@ -65,6 +65,13 @@ class User extends Authenticatable
      */
     public function hasPermissionTo(string $permissionSlug): bool
     {
+        // First, check if the user has the 'super-admin' role.
+        // If so, they bypass all other permission checks.
+        if ($this->hasRole('super-admin')) {
+            return true;
+        }
+
+        // If not a Super Admin, proceed with checking permissions through roles from the database.
         // Eager load roles and their permissions to optimize the query
         $this->loadMissing('roles.permissions');
 

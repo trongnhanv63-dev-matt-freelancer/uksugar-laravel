@@ -24,9 +24,9 @@ class RoleSeeder extends Seeder
         );
 
         // Get all permission IDs
-        $allPermissionIds = Permission::pluck('id');
+        // $allPermissionIds = Permission::pluck('id');
 
         // Assign all permissions to the Super Admin role
-        $superAdminRole->permissions()->sync($allPermissionIds);
+        // $superAdminRole->permissions()->sync($allPermissionIds);
     }
 }
