@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * The Eloquent implementation of the UserRepositoryInterface.
@@ -16,7 +17,7 @@ class EloquentUserRepository implements UserRepositoryInterface
      *
      * @var User
      */
-    protected $model;
+    protected User $model;
 
     /**
      * EloquentUserRepository constructor.
@@ -42,5 +43,34 @@ class EloquentUserRepository implements UserRepositoryInterface
     public function findByEmail(string $email): ?User
     {
         return $this->model->where('email', $email)->first();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllWithRoles(): Collection
+    {
+        // Eager load roles to prevent N+1 query problem on the index page
+        return $this->model->with('roles')->latest()->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findById(int $id): ?User
+    {
+        return $this->model->find($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function update(int $id, array $attributes): User
+    {
+        $user = $this->findById($id);
+        if ($user) {
+            $user->update($attributes);
+        }
+        return $user->fresh(); // Use fresh() for consistency
     }
 }

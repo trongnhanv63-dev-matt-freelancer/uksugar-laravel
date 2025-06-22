@@ -165,6 +165,12 @@
                     >
                         Manage Permissions
                     </a>
+                    <a
+                        href="{{ route('admin.users.index') }}"
+                        class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
+                    >
+                        Manage Users
+                    </a>
                 </nav>
             </aside>
 

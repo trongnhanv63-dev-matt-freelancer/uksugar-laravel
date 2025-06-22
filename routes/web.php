@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController as PublicLoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Middleware\EnsureUserHasRole;
@@ -40,7 +41,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('permissions', PermissionController::class)->except(['show']);
         Route::patch('permissions/{permission}/toggle-status', [PermissionController::class, 'toggleStatus'])->name('permissions.toggleStatus');
 
-
+        Route::resource('users', UserController::class)->except(['show']);
     });
 });
 

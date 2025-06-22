@@ -3,6 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Interface for the User repository.
@@ -25,4 +26,28 @@ interface UserRepositoryInterface
      * @return User|null
      */
     public function findByEmail(string $email): ?User;
+
+    /**
+     * Get all users with their roles.
+     *
+     * @return Collection<int, User>
+     */
+    public function getAllWithRoles(): Collection;
+
+    /**
+     * Find a user by their ID.
+     *
+     * @param int $id
+     * @return User|null
+     */
+    public function findById(int $id): ?User;
+
+    /**
+     * Update an existing user.
+     *
+     * @param int $id
+     * @param array<string, mixed> $attributes
+     * @return User
+     */
+    public function update(int $id, array $attributes): User;
 }
