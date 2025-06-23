@@ -4,38 +4,46 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Repositories\Contracts\RoleRepositoryInterface;
-use App\Repositories\Contracts\UserRepositoryInterface;
-use App\Services\UserService;
+use App\Services\UserService; // We only need the service now
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
 
 class UserController extends Controller
 {
+    use AuthorizesRequests;
+    // The controller now ONLY depends on the UserService.
     protected UserService $userService;
-    protected UserRepositoryInterface $userRepository;
-    protected RoleRepositoryInterface $roleRepository;
 
-    public function __construct(UserService $userService, UserRepositoryInterface $userRepository, RoleRepositoryInterface $roleRepository)
+    public function __construct(UserService $userService)
     {
         $this->userService = $userService;
-        $this->userRepository = $userRepository;
-        $this->roleRepository = $roleRepository;
     }
 
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(): View
     {
-        $users = $this->userRepository->getAllWithRoles();
+        $users = $this->userService->getUsersForIndex();
         return view('admin.users.index', compact('users'));
     }
 
-    public function create()
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): View
     {
-        $roles = $this->roleRepository->getAllWithPermissions();
+        $roles = $this->userService->getRolesForForm();
         return view('admin.users.create', compact('roles'));
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'username' => ['required', 'string', 'max:100', 'unique:users,username'],
@@ -51,18 +59,24 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
-    public function edit(User $user)
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(User $user): View
     {
-        $roles = $this->roleRepository->getAllWithPermissions();
+        $roles = $this->userService->getRolesForForm();
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
-    public function update(Request $request, User $user)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, User $user): RedirectResponse
     {
         $validated = $request->validate([
             'username' => ['required', 'string', 'max:100', 'unique:users,username,' . $user->id],
             'email' => ['required', 'string', 'email', 'max:100', 'unique:users,email,' . $user->id],
-            'password' => ['nullable', 'string', Password::min(8)->mixedCase()->numbers()->symbols()->uncompromised()],
+            'password' => ['nullable', 'string', Password::min(8)->symbols()->mixedCase()->numbers()->uncompromised()],
             'roles' => ['nullable', 'array'],
             'roles.*' => ['exists:roles,id'],
             'status' => ['required', 'string'],
@@ -72,5 +86,4 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
-
 }

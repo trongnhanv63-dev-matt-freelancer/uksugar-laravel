@@ -77,24 +77,28 @@
                         @endif
                     </td>
                     <td class="action-links">
-                        <a href="{{ route('admin.roles.edit', $role->id) }}">Edit</a>
                         @if ($role->name !== 'super-admin')
-                            <form
-                                method="POST"
-                                action="{{ route('admin.roles.toggleStatus', $role->id) }}"
-                                style="display: inline"
-                                onsubmit="return confirm('Are you sure you want to change this role\'s status?');"
-                            >
-                                @csrf
-                                @method('PATCH')
-                                <button
-                                    type="submit"
-                                    class="delete-btn"
-                                    style="color: {{ $role->status === StatusEnum::Active ? 'orange' : 'green' }}"
+                            <a href="{{ route('admin.roles.edit', $role->id) }}">Edit</a>
+                            @if ($role->name !== 'super-admin')
+                                <form
+                                    method="POST"
+                                    action="{{ route('admin.roles.toggleStatus', $role->id) }}"
+                                    style="display: inline"
+                                    onsubmit="return confirm('Are you sure you want to change this role\'s status?');"
                                 >
-                                    {{ $role->status === StatusEnum::Active ? 'Deactivate' : 'Activate' }}
-                                </button>
-                            </form>
+                                    @csrf
+                                    @method('PATCH')
+                                    <button
+                                        type="submit"
+                                        class="delete-btn"
+                                        style="color: {{ $role->status === StatusEnum::Active ? 'orange' : 'green' }}"
+                                    >
+                                        {{ $role->status === StatusEnum::Active ? 'Deactivate' : 'Activate' }}
+                                    </button>
+                                </form>
+                            @endif
+                        @else
+                            <span style="color: #6c757d">(Protected)</span>
                         @endif
                     </td>
                 </tr>

@@ -3,11 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Enums\StatusEnum;
 use App\Enums\UserStatus;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -57,7 +60,22 @@ class User extends Authenticatable
      */
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, "user_roles");
+        return $this->belongsToMany(Role::class, 'user_roles');
+    }
+
+    /**
+     * Determine if the user is a super admin.
+     *
+     * This is an accessor, allowing you to access this logic
+     * via a virtual property: $user->is_super_admin
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    public function isSuperAdmin(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->hasRole('super-admin'),
+        );
     }
 
     /**
@@ -67,21 +85,20 @@ class User extends Authenticatable
     {
         // First, check if the user has the 'super-admin' role.
         // If so, they bypass all other permission checks.
-        if ($this->hasRole('super-admin')) {
+        if ($this->is_super_admin) {
             return true;
         }
 
-        // If not a Super Admin, proceed with checking permissions through roles from the database.
-        // Eager load roles and their permissions to optimize the query
-        $this->loadMissing('roles.permissions');
-
-        foreach ($this->roles as $role) {
-            if ($role->permissions->contains('slug', $permissionSlug)) {
-                return true;
-            }
-        }
-
-        return false;
+        // Use whereHas for an efficient database query.
+        // This checks for the existence of a relationship matching constraints.
+        return $this->roles()
+            ->where('status', StatusEnum::Active) // 1. The role itself must be active
+            ->whereHas('permissions', function ($query) use ($permissionSlug) {
+                $query
+                    ->where('slug', $permissionSlug)
+                    ->where('status', StatusEnum::Active); // 2. The permission attached to that role must also be active
+            })
+            ->exists(); // Returns true if at least one such role/permission link exists
     }
 
     /**

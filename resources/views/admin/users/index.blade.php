@@ -64,7 +64,11 @@
                         </span>
                     </td>
                     <td class="action-links">
-                        <a href="{{ route('admin.users.edit', $user->id) }}">Edit</a>
+                        @if (! $user->is_super_admin)
+                            <a href="{{ route('admin.users.edit', $user->id) }}">Edit</a>
+                        @else
+                            <span style="color: #6c757d">(Protected)</span>
+                        @endif
                     </td>
                 </tr>
             @empty

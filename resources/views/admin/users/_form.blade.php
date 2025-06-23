@@ -174,6 +174,7 @@
     >
         @foreach ($roles as $role)
             @php
+                $isRoleActive = $role->status === App\Enums\StatusEnum::Active;
                 $isSuperAdminRole = $role->name === 'super-admin';
                 $userHasRole = isset($user) && $user->roles->contains($role->id);
             @endphp
@@ -185,9 +186,18 @@
                     value="{{ $role->id }}"
                     id="role_{{ $role->id }}"
                     @if($userHasRole) checked @endif
-                    @if($isSuperAdminRole) disabled @endif
+                    {{-- Disable checkbox for the super-admin role OR if the role is inactive --}}
+                    @if($isSuperAdminRole || !$isRoleActive) disabled @endif
                 />
-                <label for="role_{{ $role->id }}">{{ $role->display_name }}</label>
+                <label
+                    for="role_{{ $role->id }}"
+                    style="{{ ! $isRoleActive ? 'color: #999; text-decoration: line-through;' : '' }}"
+                >
+                    {{ $role->display_name }}
+                    @if (! $isRoleActive)
+                        (Inactive)
+                    @endif
+                </label>
                 @if ($isSuperAdminRole && $userHasRole)
                     <small>(Cannot be unassigned)</small>
                 @endif

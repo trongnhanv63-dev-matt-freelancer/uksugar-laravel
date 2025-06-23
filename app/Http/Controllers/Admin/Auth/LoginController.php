@@ -39,18 +39,24 @@ class LoginController extends Controller
         $isAuthenticated = $this->authService->attemptLogin($credentials, $remember);
 
         if ($isAuthenticated) {
-            if (auth()->user()->hasRole('super-admin')) {
+            // --- CRITICAL CHANGE HERE ---
+            // Instead of checking for a specific role, we now check for a permission.
+            // The hasPermissionTo() method already handles the super-admin override.
+            if (auth()->user()->hasPermissionTo('admin.panel.access')) {
                 $request->session()->regenerate();
                 return redirect()->intended(route('admin.dashboard'));
             }
 
+            // If a user logs in but doesn't have panel access, log them out.
             Auth::logout();
         }
 
+        // If login fails or user lacks permission, redirect back.
         return back()->withErrors([
-            'email' => 'These credentials are not valid for an administrator.',
+            'email' => 'These credentials are not valid for an administrator or you lack necessary permissions.',
         ])->onlyInput('email');
     }
+
 
     /**
      * Log the admin user out.

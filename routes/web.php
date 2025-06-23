@@ -6,7 +6,6 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController as PublicLoginController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Middleware\EnsureUserHasRole;
 use Illuminate\Support\Facades\Route; // Import the middleware class
 
 /*
@@ -23,25 +22,42 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('login', [AdminLoginController::class, 'showLoginForm'])->name('login');
         Route::post('login', [AdminLoginController::class, 'login']);
+
     });
 
     // Protected Admin Area using the full class name for the middleware.
-    Route::middleware(['auth', EnsureUserHasRole::class . ':super-admin'])->group(function () {
+    Route::middleware(['auth', 'can:admin.panel.access'])->group(function () {
+        Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
 
         Route::get('/dashboard', function () {
             return view('admin.dashboard');
         })->name('dashboard');
 
-        Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
+        Route::controller(RoleController::class)->prefix('roles')->name('roles.')->group(function () {
+            Route::get('/', 'index')->name('index')->middleware('can:roles.view');
+            Route::get('/create', 'create')->name('create')->middleware('can:roles.create');
+            Route::post('/', 'store')->name('store')->middleware('can:roles.create');
+            Route::get('/{role}/edit', 'edit')->name('edit')->middleware('can:roles.edit');
+            Route::put('/{role}', 'update')->name('update')->middleware('can:roles.edit');
+            Route::patch('/{role}/toggle-status', 'toggleStatus')->name('toggleStatus')->middleware('can:roles.edit');
+        });
 
-        Route::resource('roles', RoleController::class);
-        Route::patch('roles/{role}/toggle-status', [RoleController::class, 'toggleStatus'])->name('roles.toggleStatus');
+        Route::controller(PermissionController::class)->prefix('permissions')->name('permissions.')->group(function () {
+            Route::get('/', 'index')->name('index')->middleware('can:permissions.view');
+            Route::get('/create', 'create')->name('create')->middleware('can:permissions.create');
+            Route::post('/', 'store')->name('store')->middleware('can:permissions.create');
+            Route::get('/{permission}/edit', 'edit')->name('edit')->middleware('can:permissions.edit');
+            Route::put('/{permission}', 'update')->name('update')->middleware('can:permissions.edit');
+            Route::patch('/{permission}/toggle-status', 'toggleStatus')->name('toggleStatus')->middleware('can:permissions.edit');
+        });
 
-
-        Route::resource('permissions', PermissionController::class)->except(['show']);
-        Route::patch('permissions/{permission}/toggle-status', [PermissionController::class, 'toggleStatus'])->name('permissions.toggleStatus');
-
-        Route::resource('users', UserController::class)->except(['show']);
+        Route::controller(UserController::class)->prefix('users')->name('users.')->group(function () {
+            Route::get('/', 'index')->name('index')->middleware('can:users.view');
+            Route::get('/create', 'create')->name('create')->middleware('can:users.create');
+            Route::post('/', 'store')->name('store')->middleware('can:users.create');
+            Route::get('/{user}/edit', 'edit')->name('edit')->middleware('can:users.edit');
+            Route::put('/{user}', 'update')->name('update')->middleware('can:users.edit');
+        });
     });
 });
 
@@ -60,9 +76,10 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::post('logout', [PublicLoginController::class, 'logout'])->name('logout');
+
     Route::get('/dashboard', function () {
         return 'Welcome to your public dashboard, ' . auth()->user()->username . '!';
     })->name('dashboard');
 
-    Route::post('logout', [PublicLoginController::class, 'logout'])->name('logout');
 });

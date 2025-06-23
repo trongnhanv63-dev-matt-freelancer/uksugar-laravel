@@ -50,6 +50,8 @@ class RoleService
         // If it IS 'super-admin', this block is skipped entirely.
         if ($role->name !== 'super-admin') {
             $role->permissions()->sync($data['permissions'] ?? []);
+        } else {
+            throw new Exception('The Super Admin role cannot be modified.');
         }
 
         return $role;
