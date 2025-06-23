@@ -79,7 +79,7 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [PublicLoginController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard', function () {
-        return 'Welcome to your public dashboard, ' . auth()->user()->username . '!';
+        return 'Welcome to your public dashboard, ' . auth()->user()->name . '!';
     })->name('dashboard');
 
 });

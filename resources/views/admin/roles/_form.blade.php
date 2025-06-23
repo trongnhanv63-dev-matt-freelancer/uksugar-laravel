@@ -97,7 +97,7 @@
     >
         @foreach ($permissions as $permission)
             @php
-                $isPermissionActive = $permission->status === App\Enums\StatusEnum::Active;
+                $isPermissionActive = $permission->status === config("rbac.permission_statuses.active");
                 $isSuperAdminRole = isset($role) && $role->name === "super-admin";
             @endphp
 

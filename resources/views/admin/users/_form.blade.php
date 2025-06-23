@@ -18,16 +18,16 @@
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
     <div>
         <label
-            for="username"
+            for="name"
             style="display: block"
         >
-            Username
+            Name
         </label>
         <input
             type="text"
-            name="username"
-            id="username"
-            value="{{ old('username', $user->username ?? '') }}"
+            name="name"
+            id="name"
+            value="{{ old('name', $user->name ?? '') }}"
             style="width: 100%; padding: 0.5rem"
             required
         />
@@ -68,13 +68,13 @@
         <input
             type="text"
             style="width: 100%; padding: 0.5rem; background-color: #e9ecef; color: #6c757d"
-            value="{{ ucfirst($user->status->value) }}"
+            value="{{ ucfirst($user->status) }}"
             readonly
         />
         <input
             type="hidden"
             name="status"
-            value="{{ $user->status->value }}"
+            value="{{ $user->status }}"
         />
         <small>You cannot change the status of the Super Admin or your own account.</small>
     @else
@@ -84,17 +84,17 @@
             id="status"
             style="width: 100%; padding: 0.5rem"
         >
-            @foreach (App\Enums\UserStatus::cases() as $status)
+            @foreach (config('rbac.user_statuses') as $status)
                 {{-- Don't show some internal statuses like 'locked' in the dropdown --}}
-                @if (in_array($status->value, ['locked']))
+                @if (in_array($status, ['locked']))
                     @continue
                 @endif
 
                 <option
-                    value="{{ $status->value }}"
-                    @selected(old('status', $user->status->value ?? '') == $status->value)
+                    value="{{ $status }}"
+                    @selected(old('status', $user->status ?? '') == $status)
                 >
-                    {{ ucfirst(str_replace('_', ' ', $status->value)) }}
+                    {{ ucfirst(str_replace('_', ' ', $status)) }}
                 </option>
             @endforeach
         </select>
@@ -174,7 +174,7 @@
     >
         @foreach ($roles as $role)
             @php
-                $isRoleActive = $role->status === App\Enums\StatusEnum::Active;
+                $isRoleActive = $role->status === config('rbac.role_statuses.active');
                 $isSuperAdminRole = $role->name === 'super-admin';
                 $userHasRole = isset($user) && $user->roles->contains($role->id);
             @endphp

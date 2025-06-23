@@ -10,7 +10,7 @@
     <div class="content-body">
         <p>
             Welcome back,
-            <strong>{{ auth()->user()->username }}</strong>
+            <strong>{{ auth()->user()->name }}</strong>
             !
         </p>
         <p>From here, you can manage the application's roles, permissions, users, and other settings.</p>

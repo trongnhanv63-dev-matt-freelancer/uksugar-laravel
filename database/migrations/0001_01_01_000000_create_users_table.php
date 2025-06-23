@@ -12,16 +12,12 @@ return new class () extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('username')->unique();
+            $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-
-            // Replace the 'is_active' boolean with a more descriptive status column.
-            $table->string('status', 30)->default('pending_verification')
-                ->comment('Possible values: pending_verification, active, inactive, suspended, banned, locked');
-
             $table->timestamp('last_login_at')->nullable()->comment('Timestamp of the last successful login');
+
             $table->rememberToken();
             $table->timestamps();
         });

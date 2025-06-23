@@ -2,7 +2,7 @@
 @section('title', 'Edit User')
 @section('content')
     <div class="content-header">
-        <h1>Edit User: {{ $user->username }}</h1>
+        <h1>Edit User: {{ $user->name }}</h1>
         <a
             href="{{ route('admin.users.index') }}"
             class="btn btn-primary"

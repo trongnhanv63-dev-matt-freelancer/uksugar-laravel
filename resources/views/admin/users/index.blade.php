@@ -1,5 +1,4 @@
 @extends('admin.layouts.app')
-@use(App\Enums\UserStatus)
 
 @section('title', 'Manage Users')
 
@@ -25,7 +24,7 @@
     <table>
         <thead>
             <tr>
-                <th>Username</th>
+                <th>Name</th>
                 <th>Email</th>
                 <th>Roles</th>
                 <th>Status</th>
@@ -36,7 +35,7 @@
             @forelse ($users as $user)
                 <tr>
                     <td>
-                        {{ $user->username }}
+                        {{ $user->name }}
                         @if ($user->is_super_admin)
                             ⭐
                         @endif
@@ -59,8 +58,12 @@
                         @endforeach
                     </td>
                     <td>
-                        <span style="color: {{ $user->status === UserStatus::Active ? 'green' : 'red' }}">
-                            ● {{ ucfirst($user->status->value) }}
+                        <span
+                            style="
+                                color: {{ $user->status === config('rbac.user_statuses.active') ? 'green' : 'red' }};
+                            "
+                        >
+                            ● {{ ucfirst($user->status) }}
                         </span>
                     </td>
                     <td class="action-links">

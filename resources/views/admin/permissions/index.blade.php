@@ -1,7 +1,5 @@
 @extends('admin.layouts.app')
 
-@use(App\Enums\StatusEnum)
-
 @section('title', 'Manage Permissions')
 
 @section('content')
@@ -34,8 +32,12 @@
                     <td><code>{{ $permission->slug }}</code></td>
                     <td>{{ $permission->description }}</td>
                     <td>
-                        <span style="color: {{ $permission->status === StatusEnum::Active ? 'green' : 'red' }}">
-                            ● {{ ucfirst($permission->status->value) }}
+                        <span
+                            style="
+                                color: {{ $permission->status === config('rbac.permission_statuses.active') ? 'green' : 'red' }};
+                            "
+                        >
+                            ● {{ ucfirst($permission->status) }}
                         </span>
                     </td>
                     <td class="action-links">
@@ -51,9 +53,11 @@
                             <button
                                 type="submit"
                                 class="delete-btn"
-                                style="color: {{ $permission->status === StatusEnum::Active ? 'orange' : 'green' }}"
+                                style="
+                                    color: {{ $permission->status === config('rbac.permission_statuses.active') ? 'orange' : 'green' }};
+                                "
                             >
-                                {{ $permission->status === StatusEnum::Active ? 'Deactivate' : 'Activate' }}
+                                {{ $permission->status === config('rbac.permission_statuses.active') ? 'Deactivate' : 'Activate' }}
                             </button>
                         </form>
                     </td>

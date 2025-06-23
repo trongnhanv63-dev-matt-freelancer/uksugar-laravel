@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace {{ namespace }};
 
 use Illuminate\Database\Seeder;
 use NhanDev\Rbac\Models\Permission;
@@ -15,7 +15,7 @@ class PermissionSeeder extends Seeder
         // The list of foundational permissions for the application
         $permissions = [
             'admin.panel.access',
-
+            
             // User Management
             'users.view',
             'users.create',

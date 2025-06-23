@@ -192,7 +192,7 @@
                 <header class="header">
                     <div class="user-info">
                         Logged in as:
-                        <strong>{{ auth()->user()->username }}</strong>
+                        <strong>{{ auth()->user()->name }}</strong>
                     </div>
                     <form
                         method="POST"

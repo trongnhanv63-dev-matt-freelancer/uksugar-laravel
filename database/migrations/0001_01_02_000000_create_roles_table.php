@@ -14,6 +14,7 @@ return new class () extends Migration {
             $table->id(); // Shortcut for bigIncrements('id')
             $table->string('name')->unique()->comment('The unique name of the role, e.g., super-admin, editor');
             $table->string('display_name')->nullable()->comment('A human-readable name for the role, e.g., Super Admin');
+            $table->string('status', 20)->default('active');
             $table->text('description')->nullable()->comment('A short description of the role\'s purpose');
             $table->timestamps(); // Creates created_at and updated_at columns
         });

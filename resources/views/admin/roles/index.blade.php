@@ -1,7 +1,5 @@
 @extends('admin.layouts.app')
 
-@use(App\Enums\StatusEnum)
-
 @section('title', 'Manage Roles')
 
 @section('content')
@@ -39,8 +37,12 @@
                     <td>{{ $role->name }}</td>
                     <td>{{ $role->display_name }}</td>
                     <td>
-                        <span style="color: {{ $role->status === StatusEnum::Active ? 'green' : 'red' }}">
-                            ● {{ ucfirst($role->status->value) }}
+                        <span
+                            style="
+                                color: {{ $role->status === config('rbac.role_statuses.active') ? 'green' : 'red' }};
+                            "
+                        >
+                            ● {{ ucfirst($role->status) }}
                         </span>
                     </td>
                     <td>
@@ -91,9 +93,11 @@
                                     <button
                                         type="submit"
                                         class="delete-btn"
-                                        style="color: {{ $role->status === StatusEnum::Active ? 'orange' : 'green' }}"
+                                        style="
+                                            color: {{ $role->status === config('rbac.role_statuses.active') ? 'orange' : 'green' }};
+                                        "
                                     >
-                                        {{ $role->status === StatusEnum::Active ? 'Deactivate' : 'Activate' }}
+                                        {{ $role->status === config('rbac.role_statuses.active') ? 'Deactivate' : 'Activate' }}
                                     </button>
                                 </form>
                             @endif
