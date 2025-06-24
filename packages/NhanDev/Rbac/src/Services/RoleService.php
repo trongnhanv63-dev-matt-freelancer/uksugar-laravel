@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Collection;
 use NhanDev\Rbac\Models\Role;
 use NhanDev\Rbac\Repositories\Contracts\PermissionRepositoryInterface;
 use NhanDev\Rbac\Repositories\Contracts\RoleRepositoryInterface;
+use NhanDev\Rbac\Services\Concerns\LogsRelationshipChanges;
 
 class RoleService
 {
+    use LogsRelationshipChanges;
+
     protected RoleRepositoryInterface $roleRepository;
     protected PermissionRepositoryInterface $permissionRepository;
 
@@ -48,12 +51,14 @@ class RoleService
         // It checks if the role is NOT 'super-admin' before syncing permissions.
         // If it IS 'super-admin', this block is skipped entirely.
         if ($role->name !== 'super-admin') {
-            $role->permissions()->sync($data['permissions'] ?? []);
+            $changes = $role->permissions()->sync($data['permissions'] ?? []);
+            // Call the logging method from the trait
+            $this->logSyncActivity($role, "Updated permissions for role '{$role->name}'", $changes);
         } else {
             throw new Exception('The Super Admin role cannot be modified.');
         }
 
-        return $role;
+        return $role->fresh();
     }
 
     public function toggleRoleStatus(int $roleId): Role

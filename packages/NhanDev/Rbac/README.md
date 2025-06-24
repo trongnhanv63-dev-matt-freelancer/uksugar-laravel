@@ -36,7 +36,7 @@ composer require nhandev/rbac
 Package cung cấp một lệnh Artisan tiện lợi để tự động hóa việc thiết lập.
 
 ```bash
-php artisan rbac:install
+php artisan rbac:make-seeders
 ```
 
 Lệnh này sẽ thực hiện các hành động sau:

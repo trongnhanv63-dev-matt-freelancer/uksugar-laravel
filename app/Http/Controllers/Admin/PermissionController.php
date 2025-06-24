@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Permission;
-use App\Services\PermissionService; // Import the service
-use Illuminate\Http\RedirectResponse;
+use App\Services\PermissionService;
+use Illuminate\Http\RedirectResponse; // Import the service
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use NhanDev\Rbac\Models\Permission;
 
 class PermissionController extends Controller
 {

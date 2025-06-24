@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use NhanDev\Rbac\Repositories\Contracts\RoleRepositoryInterface;
 use NhanDev\Rbac\Repositories\Contracts\UserRepositoryInterface;
+use NhanDev\Rbac\Services\Concerns\LogsRelationshipChanges;
 
 class UserService
 {
+    use LogsRelationshipChanges;
+
     protected UserRepositoryInterface $userRepository;
     protected RoleRepositoryInterface $roleRepository;
 
@@ -54,6 +57,7 @@ class UserService
         }
 
         $userToUpdate = $this->userRepository->findById($userId);
+
         // Add this check
         if ($userToUpdate->is_super_admin) {
             throw new Exception('The Super Admin user cannot be modified.');
@@ -62,7 +66,10 @@ class UserService
         $user = $this->userRepository->update($userId, Arr::except($data, ['roles']));
 
         if (isset($data['roles'])) {
-            $user->roles()->sync($data['roles']);
+            $changes = $user->roles()->sync($data['roles']);
+            // Call the logging method from the trait
+            $this->logSyncActivity($user, "Updated roles for user '{$user->username}'", $changes);
+
         } else {
             $user->roles()->sync([]);
         }

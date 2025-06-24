@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use NhanDev\Rbac\Models\Traits\HasRolesAndPermissions; // Import the trait
+use NhanDev\Rbac\Models\Traits\LogsActivity;
 
 class User extends Authenticatable
 {
     use HasFactory;
     use Notifiable;
     use HasRolesAndPermissions;
+    use LogsActivity;
 
     /**
      * The attributes that are mass assignable.
