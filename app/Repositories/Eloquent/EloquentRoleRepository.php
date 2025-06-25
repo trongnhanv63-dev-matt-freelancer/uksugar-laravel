@@ -2,45 +2,56 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Models\Role;
+use App\Models\Role; // Use your custom Role model
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * The Eloquent implementation of the RoleRepositoryInterface.
+ */
 class EloquentRoleRepository implements RoleRepositoryInterface
 {
-    protected Role $model;
-
-    public function __construct(Role $model)
-    {
-        $this->model = $model;
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function getAllWithPermissions(): Collection
     {
-        // Eager load the permissions relationship to avoid N+1 problems
-        return $this->model->with('permissions')->get();
+        return Role::with('permissions')->latest('id')->get();
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllActive(): Collection
+    {
+        return Role::where('status', 'active')->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function findById(int $id): ?Role
     {
-        // Use findOrFail to automatically handle the case where the role is not found.
-        return $this->model->findOrFail($id);
+        return Role::find($id);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function create(array $attributes): Role
     {
-        return $this->model->create($attributes);
+        return Role::create($attributes);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function update(int $id, array $attributes): Role
     {
         $role = $this->findById($id);
-        $role->update($attributes);
+        if ($role) {
+            $role->update($attributes);
+        }
         return $role;
-    }
-
-    public function delete(int $id): bool
-    {
-        return $this->findById($id)->delete();
     }
 }

@@ -1,119 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <title>Admin Sign In</title>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-    {{-- Reusing the same simple style --}}
-    <style>
-        body {
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #343a40;
-        }
+        <link
+            rel="preconnect"
+            href="https://fonts.bunny.net"
+        />
+        <link
+            href="https://fonts.bunny.net/css?family=inter:400,500,600&display=swap"
+            rel="stylesheet"
+        />
 
-        form {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-        }
+        @vite('resources/css/app.css')
+    </head>
+    <body class="font-sans antialiased flex flex-col min-h-screen bg-white">
+        <header class="w-full h-32 bg-primary"></header>
 
-        div {
-            margin-bottom: 1rem;
-        }
+        <main class="flex-grow flex items-center justify-center">
+            <div class="w-full max-w-xs mx-auto">
+                <h1 class="text-center text-2xl font-semibold text-gray-800 mb-6">Admin Sign In</h1>
 
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-        }
+                <form
+                    method="POST"
+                    action="{{ route('admin.login') }}"
+                    class="space-y-4"
+                >
+                    @csrf
 
-        input[type="email"],
-        input[type="password"] {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
+                    <div>
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            required
+                            autofocus
+                            placeholder="Login"
+                            autocomplete="username"
+                            class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/80"
+                        />
+                    </div>
 
-        button {
-            width: 100%;
-            padding: 0.75rem;
-            border: none;
-            border-radius: 4px;
-            background-color: #dc3545;
-            color: white;
-            font-size: 1rem;
-            cursor: pointer;
-        }
+                    <div>
+                        <input
+                            id="password"
+                            type="password"
+                            name="password"
+                            required
+                            placeholder="Password"
+                            autocomplete="current-password"
+                            class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/80"
+                        />
+                    </div>
 
-        button:hover {
-            background-color: #c82333;
-        }
+                    <div>
+                        <button
+                            type="submit"
+                            class="w-full font-bold py-3 px-4 rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200"
+                        >
+                            Let's Go!
+                        </button>
+                    </div>
 
-        .error {
-            color: red;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
+                    <div class="text-center pt-2">
+                        <a
+                            href="#"
+                            class="text-sm font-medium text-red-600 hover:text-red-500"
+                        >
+                            Forgot Password?
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </main>
 
-        .remember {
-            display: flex;
-            align-items: center;
-        }
-
-        .remember label {
-            margin-bottom: 0;
-            margin-left: 0.5rem;
-        }
-    </style>
-</head>
-
-<body>
-    {{-- The form now posts to the 'admin.login' route --}}
-    <form method="POST" action="{{ route('admin.login') }}">
-        @csrf
-
-        <h2>Admin Portal Login</h2>
-
-        @if ($errors->any())
-        <div>
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li class="error">{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-
-        <div>
-            <label for="email">Email Address</label>
-            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus>
-        </div>
-
-        <div>
-            <label for="password">Password</label>
-            <input id="password" type="password" name="password" required>
-        </div>
-
-    <div class="remember">
-            <input type="checkbox" name="remember" id="remember">
-        <label for="remember">Remember Me</label>
-        </div>
-
-        <div>
-            <button type="submit">
-                Login
-            </button>
-        </div>
-    </form>
-</body>
-
+        <footer class="w-full h-32 bg-primary"></footer>
+    </body>
 </html>

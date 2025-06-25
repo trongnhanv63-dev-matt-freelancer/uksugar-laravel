@@ -13,16 +13,16 @@ use Illuminate\Database\Eloquent\Collection;
 class EloquentUserRepository implements UserRepositoryInterface
 {
     /**
-     * The Eloquent User model.
+     * The Eloquent User model instance.
      *
-     * @var User
+     * @var \App\Models\User
      */
     protected User $model;
 
     /**
      * EloquentUserRepository constructor.
      *
-     * @param User $model
+     * @param \App\Models\User $model
      */
     public function __construct(User $model)
     {
@@ -32,26 +32,11 @@ class EloquentUserRepository implements UserRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(array $attributes): User
-    {
-        return $this->model->create($attributes);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function findByEmail(string $email): ?User
-    {
-        return $this->model->where('email', $email)->first();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getAllWithRoles(): Collection
     {
-        // Eager load roles to prevent N+1 query problem on the index page
-        return $this->model->with('roles')->latest()->get();
+        // Eager load the 'roles' relationship to prevent N+1 query problems on the index page.
+        // Order by the latest created users.
+        return $this->model->with('roles')->latest('id')->get();
     }
 
     /**
@@ -65,12 +50,29 @@ class EloquentUserRepository implements UserRepositoryInterface
     /**
      * {@inheritdoc}
      */
+    public function findByEmail(string $email): ?User
+    {
+        return $this->model->where('email', $email)->first();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function create(array $attributes): User
+    {
+        return $this->model->create($attributes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function update(int $id, array $attributes): User
     {
         $user = $this->findById($id);
         if ($user) {
             $user->update($attributes);
         }
-        return $user->fresh(); // Use fresh() for consistency
+        // Return a fresh instance to ensure the returned model has the latest data.
+        return $user->fresh();
     }
 }

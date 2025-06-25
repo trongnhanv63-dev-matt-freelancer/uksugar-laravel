@@ -7,30 +7,14 @@ use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Interface for the User repository.
- * Defines the contract for data access operations for Users.
+ * Defines the contract for all data access operations related to Users.
  */
 interface UserRepositoryInterface
 {
     /**
-     * Create a new user record in the database.
+     * Get all users with their assigned roles.
      *
-     * @param array<string, mixed> $attributes
-     * @return User
-     */
-    public function create(array $attributes): User;
-
-    /**
-     * Find a user by their email address.
-     *
-     * @param string $email
-     * @return User|null
-     */
-    public function findByEmail(string $email): ?User;
-
-    /**
-     * Get all users with their roles.
-     *
-     * @return Collection<int, User>
+     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\User>
      */
     public function getAllWithRoles(): Collection;
 
@@ -38,16 +22,32 @@ interface UserRepositoryInterface
      * Find a user by their ID.
      *
      * @param int $id
-     * @return User|null
+     * @return \App\Models\User|null
      */
     public function findById(int $id): ?User;
 
     /**
-     * Update an existing user.
+     * Find a user by their email address. Essential for login logic.
+     *
+     * @param string $email
+     * @return \App\Models\User|null
+     */
+    public function findByEmail(string $email): ?User;
+
+    /**
+     * Create a new user record.
+     *
+     * @param array<string, mixed> $attributes
+     * @return \App\Models\User
+     */
+    public function create(array $attributes): User;
+
+    /**
+     * Update an existing user's attributes.
      *
      * @param int $id
      * @param array<string, mixed> $attributes
-     * @return User
+     * @return \App\Models\User
      */
     public function update(int $id, array $attributes): User;
 }

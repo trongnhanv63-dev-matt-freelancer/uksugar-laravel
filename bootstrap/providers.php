@@ -2,6 +2,6 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    NhanDev\Rbac\Providers\RbacServiceProvider::class,
-    NhanDev\Rbac\Providers\ActivityLogServiceProvider::class,
+    App\Providers\AuthServiceProvider::class,
+    App\Providers\RepositoryServiceProvider::class,
 ];

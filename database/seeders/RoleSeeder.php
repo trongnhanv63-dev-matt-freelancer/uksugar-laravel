@@ -2,23 +2,27 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
 use Illuminate\Database\Seeder;
-use NhanDev\Rbac\Models\Role;
 
 class RoleSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Create the Super Admin role if it does not exist
-        Role::firstOrCreate(
-            ['name' => 'super-admin'],
-            [
-                'display_name' => 'Super Admin',
-                'description' => 'Has all permissions',
-            ]
-        );
+        // Create Super Admin role
+        $superAdminRole = Role::create(['name' => 'super-admin']);
+
+        // Create a regular admin role
+        $adminRole = Role::create(['name' => 'admin']);
+
+        // Assign some permissions to the admin role
+        $adminRole->givePermissionTo([
+            'admin.panel.access',
+            'users.view',
+            'roles.view',
+        ]);
+
+        // The logic to assign all permissions to super-admin is removed,
+        // as their power comes from the Gate::before() check.
     }
 }

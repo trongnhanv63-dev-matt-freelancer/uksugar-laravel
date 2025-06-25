@@ -16,6 +16,8 @@ return new class () extends Migration {
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('status', 30)->default('pending_verification')
+                ->comment('Possible values: pending_verification, active, inactive, suspended, banned, locked');
             $table->timestamp('last_login_at')->nullable()->comment('Timestamp of the last successful login');
 
             $table->rememberToken();

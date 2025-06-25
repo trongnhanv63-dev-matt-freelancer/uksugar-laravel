@@ -7,14 +7,21 @@ use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Interface for the Role repository.
+ * Defines the contract for data access operations for Roles.
  */
 interface RoleRepositoryInterface
 {
     /**
-     * Get all roles with their permissions.
+     * Get all roles with their associated permissions.
      * @return Collection<int, Role>
      */
     public function getAllWithPermissions(): Collection;
+
+    /**
+     * Get all active roles.
+     * @return Collection<int, Role>
+     */
+    public function getAllActive(): Collection;
 
     /**
      * Find a role by its ID.
@@ -31,17 +38,10 @@ interface RoleRepositoryInterface
     public function create(array $attributes): Role;
 
     /**
-     * Update an existing role.
+     * Update an existing role's attributes.
      * @param int $id
      * @param array<string, mixed> $attributes
      * @return Role
      */
     public function update(int $id, array $attributes): Role;
-
-    /**
-     * Delete a role by its ID.
-     * @param int $id
-     * @return bool
-     */
-    public function delete(int $id): bool;
 }

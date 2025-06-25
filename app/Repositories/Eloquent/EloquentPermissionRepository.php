@@ -2,43 +2,56 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Models\Permission;
+use App\Models\Permission; // Use your custom Permission model
 use App\Repositories\Contracts\PermissionRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * The Eloquent implementation of the PermissionRepositoryInterface.
+ */
 class EloquentPermissionRepository implements PermissionRepositoryInterface
 {
-    protected Permission $model;
-
-    public function __construct(Permission $model)
-    {
-        $this->model = $model;
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function getAll(): Collection
     {
-        return $this->model->orderBy('slug')->get();
+        return Permission::latest('id')->get();
     }
 
-    public function create(array $attributes): Permission
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllActive(): Collection
     {
-        return $this->model->create($attributes);
+        return Permission::where('status', 'active')->get();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function findById(int $id): ?Permission
     {
-        return $this->model->findOrFail($id);
+        return Permission::find($id);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function create(array $attributes): Permission
+    {
+        return Permission::create($attributes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function update(int $id, array $attributes): Permission
     {
         $permission = $this->findById($id);
-        $permission->update($attributes);
+        if ($permission) {
+            $permission->update($attributes);
+        }
         return $permission;
-    }
-
-    public function delete(int $id): bool
-    {
-        return $this->findById($id)->delete();
     }
 }

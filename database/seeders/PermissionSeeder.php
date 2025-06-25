@@ -2,42 +2,27 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use NhanDev\Rbac\Models\Permission;
+use App\Models\Permission;
+use Illuminate\Database\Seeder; // Sử dụng Model của Spatie
 
 class PermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // The list of foundational permissions for the application
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // Define permissions
         $permissions = [
             'admin.panel.access',
-
-            // User Management
-            'users.view',
-            'users.create',
-            'users.edit',
-
-            // Role & Permission Management
-            'roles.view',
-            'roles.create',
-            'roles.edit',
-
-            // Other permissions can be added here
-            'permissions.view',
-            'permissions.create',
-            'permissions.edit',
+            'roles.view', 'roles.create', 'roles.edit',
+            'permissions.view', 'permissions.create', 'permissions.edit',
+            'users.view', 'users.create', 'users.edit',
         ];
 
-        // Loop through the permissions and create them if they do not exist
-        foreach ($permissions as $permissionSlug) {
-            Permission::firstOrCreate(
-                ['slug' => $permissionSlug],
-                ['description' => "Permission to {$permissionSlug}"]
-            );
+        // Create permissions
+        foreach ($permissions as $permission) {
+            Permission::create(['name' => $permission]);
         }
     }
 }

@@ -1,12 +1,12 @@
 @csrf
 
 @if ($errors->any())
-    <div class="alert alert-danger">
-        <strong>Whoops!</strong>
-        There were some problems with your input.
-        <br />
-        <br />
-        <ul>
+    <div
+        class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6"
+        role="alert"
+    >
+        <p class="font-bold">Please fix the following errors:</p>
+        <ul class="mt-2 list-disc list-inside">
             @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
             @endforeach
@@ -14,208 +14,212 @@
     </div>
 @endif
 
-{{-- User details grid --}}
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
-    <div>
-        <label
-            for="name"
-            style="display: block"
-        >
-            Name
-        </label>
-        <input
-            type="text"
-            name="name"
-            id="name"
-            value="{{ old('name', $user->name ?? '') }}"
-            style="width: 100%; padding: 0.5rem"
-            required
-        />
-    </div>
-    <div>
-        <label
-            for="email"
-            style="display: block"
-        >
-            Email
-        </label>
-        <input
-            type="email"
-            name="email"
-            id="email"
-            value="{{ old('email', $user->email ?? '') }}"
-            style="width: 100%; padding: 0.5rem"
-            required
-        />
-    </div>
-</div>
+@php
+    // Determine if the user being edited is protected (is a super-admin)
+    // We will handle the "self-edit" case via policy or in the controller if needed.
+    $isProtectedUser = isset($user) && $user->hasRole('super-admin');
+@endphp
 
-{{-- Status Section --}}
-<div style="margin-top: 1rem">
-    <label
-        for="status"
-        style="display: block"
-    >
-        Status
-    </label>
-    @php
-        // Check if the user being edited is the current user or a super admin
-        $isProtectedUser = isset($user) && (auth()->id() === $user->id || $user->is_super_admin);
-    @endphp
-
-    @if ($isProtectedUser)
-        {{-- If protected, show a read-only input and a hidden input --}}
-        <input
-            type="text"
-            style="width: 100%; padding: 0.5rem; background-color: #e9ecef; color: #6c757d"
-            value="{{ ucfirst($user->status) }}"
-            readonly
-        />
-        <input
-            type="hidden"
-            name="status"
-            value="{{ $user->status }}"
-        />
-        <small>You cannot change the status of the Super Admin or your own account.</small>
-    @else
-        {{-- If not protected, show the regular select box --}}
-        <select
-            name="status"
-            id="status"
-            style="width: 100%; padding: 0.5rem"
-        >
-            @foreach (config('rbac.user_statuses') as $status)
-                {{-- Don't show some internal statuses like 'locked' in the dropdown --}}
-                @if (in_array($status, ['locked']))
-                    @continue
-                @endif
-
-                <option
-                    value="{{ $status }}"
-                    @selected(old('status', $user->status ?? '') == $status)
-                >
-                    {{ ucfirst(str_replace('_', ' ', $status)) }}
-                </option>
-            @endforeach
-        </select>
-    @endif
-</div>
-
-{{-- Password section with toggle button (Requirement 2 & 3) --}}
-<div style="margin-top: 1rem">
-    @if (isset($user))
-        {{-- This block shows on the EDIT form --}}
-        <div id="password-placeholder">
-            <label style="display: block">Password</label>
-            <input
-                type="text"
-                style="width: 100%; padding: 0.5rem; background-color: #e9ecef; color: #6c757d"
-                value="••••••••••"
-                readonly
-            />
-            <button
-                type="button"
-                onclick="showPasswordFields()"
-                class="btn btn-primary"
-                style="margin-top: 0.5rem; background-color: #6c757d; font-size: 0.8rem; padding: 0.25rem 0.5rem"
-            >
-                Change Password
-            </button>
-        </div>
-        <div
-            id="password-fields"
-            style="display: none"
-        >
-            <label
-                for="password"
-                style="display: block"
-            >
-                New Password
-            </label>
-            <input
-                type="password"
-                name="password"
-                id="password"
-                style="width: 100%; padding: 0.5rem"
-            />
-            <small>Leave blank to keep the current password.</small>
-        </div>
-    @else
-        {{-- This block shows on the CREATE form --}}
+<div class="space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
             <label
-                for="password"
-                style="display: block"
+                for="username"
+                class="block text-sm font-medium leading-6 text-gray-900"
             >
-                Password
+                Username
             </label>
-            <input
-                type="password"
-                name="password"
-                id="password"
-                style="width: 100%; padding: 0.5rem"
-                required
-            />
-        </div>
-    @endif
-</div>
-
-{{-- Roles Section --}}
-<div style="margin-top: 1rem">
-    <strong>Roles:</strong>
-    <br />
-    <div
-        style="
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 0.5rem;
-        "
-    >
-        @foreach ($roles as $role)
-            @php
-                $isRoleActive = $role->status === config('rbac.role_statuses.active');
-                $isSuperAdminRole = $role->name === 'super-admin';
-                $userHasRole = isset($user) && $user->roles->contains($role->id);
-            @endphp
-
-            <div>
+            <div class="mt-2">
                 <input
-                    type="checkbox"
-                    name="roles[]"
-                    value="{{ $role->id }}"
-                    id="role_{{ $role->id }}"
-                    @if($userHasRole) checked @endif
-                    {{-- Disable checkbox for the super-admin role OR if the role is inactive --}}
-                    @if($isSuperAdminRole || !$isRoleActive) disabled @endif
+                    type="text"
+                    name="username"
+                    id="username"
+                    value="{{ old('username', $user->username ?? '') }}"
+                    required
+                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
-                <label
-                    for="role_{{ $role->id }}"
-                    style="{{ ! $isRoleActive ? 'color: #999; text-decoration: line-through;' : '' }}"
-                >
-                    {{ $role->display_name }}
-                    @if (! $isRoleActive)
-                        (Inactive)
-                    @endif
-                </label>
-                @if ($isSuperAdminRole && $userHasRole)
-                    <small>(Cannot be unassigned)</small>
-                @endif
             </div>
-        @endforeach
+        </div>
+
+        <div>
+            <label
+                for="email"
+                class="block text-sm font-medium leading-6 text-gray-900"
+            >
+                Email
+            </label>
+            <div class="mt-2">
+                <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    value="{{ old('email', $user->email ?? '') }}"
+                    required
+                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+            </div>
+        </div>
+    </div>
+
+    <div>
+        @if (isset($user))
+            <div id="password-wrapper">
+                <label class="block text-sm font-medium leading-6 text-gray-900">Password</label>
+                <div
+                    id="password-placeholder"
+                    class="mt-2"
+                >
+                    <input
+                        type="text"
+                        class="block w-full rounded-md border-0 py-1.5 bg-gray-100 cursor-not-allowed"
+                        value="••••••••••"
+                        readonly
+                    />
+                    <button
+                        type="button"
+                        onclick="showPasswordFields()"
+                        class="mt-2 text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                    >
+                        Change Password
+                    </button>
+                </div>
+                <div
+                    id="password-fields"
+                    style="display: none"
+                    class="mt-2"
+                >
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        placeholder="Enter new password"
+                    />
+                    <p class="mt-2 text-xs text-gray-500">Leave blank to keep current password.</p>
+                </div>
+            </div>
+        @else
+            <div>
+                <label
+                    for="password"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                >
+                    Password
+                </label>
+                <div class="mt-2">
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        required
+                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                </div>
+            </div>
+        @endif
+    </div>
+
+    <div>
+        <label
+            for="status"
+            class="block text-sm font-medium leading-6 text-gray-900"
+        >
+            Status
+        </label>
+        <div class="mt-2">
+            @if ($isProtectedUser)
+                <input
+                    type="text"
+                    class="block w-full rounded-md border-0 py-1.5 bg-gray-100 cursor-not-allowed"
+                    value="{{ ucfirst($user->status) }}"
+                    readonly
+                />
+                <input
+                    type="hidden"
+                    name="status"
+                    value="{{ $user->status }}"
+                />
+            @else
+                <select
+                    id="status"
+                    name="status"
+                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                >
+                    <option
+                        value="active"
+                        @selected(old('status', $user->status ?? 'active') == 'active')
+                    >
+                        Active
+                    </option>
+                    <option
+                        value="inactive"
+                        @selected(old('status', $user->status ?? '') == 'inactive')
+                    >
+                        Inactive
+                    </option>
+                    <option
+                        value="suspended"
+                        @selected(old('status', $user->status ?? '') == 'suspended')
+                    >
+                        Suspended
+                    </option>
+                </select>
+            @endif
+        </div>
+    </div>
+
+    <div class="pt-6 border-t border-gray-200">
+        <label class="block text-base font-medium leading-6 text-gray-900">Assign Roles</label>
+        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            @foreach ($roles as $role)
+                @php
+                    $userHasRole = isset($user) && $user->hasRole($role->name);
+                @endphp
+
+                <div class="relative flex items-start">
+                    <div class="flex h-6 items-center">
+                        <input
+                            id="role_{{ $role->id }}"
+                            name="roles[]"
+                            type="checkbox"
+                            value="{{ $role->name }}"
+                            @if($userHasRole) checked @endif
+                            @if($role->name === 'super-admin') disabled @endif
+                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                        />
+                    </div>
+                    <div class="ml-3 text-sm leading-6">
+                        <label
+                            for="role_{{ $role->id }}"
+                            class="{{ $role->name === 'super-admin' ? 'text-gray-500' : 'text-gray-900' }}"
+                        >
+                            {{ $role->name }}
+                        </label>
+                    </div>
+                </div>
+            @endforeach
+        </div>
     </div>
 </div>
 
-<div style="margin-top: 2rem">
-    <button
-        type="submit"
-        class="btn btn-primary"
-    >
-        {{ $submitButtonText ?? 'Save' }}
-    </button>
+<div class="mt-8 pt-5 border-t border-gray-200">
+    <div class="flex justify-end gap-x-3">
+        <a
+            href="{{ route('admin.users.index') }}"
+            class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+        >
+            Cancel
+        </a>
+        <button
+            type="submit"
+            @if($isProtectedUser) disabled @endif
+            class="inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 @if($isProtectedUser) opacity-50 cursor-not-allowed @endif"
+        >
+            {{ $submitButtonText ?? 'Save' }}
+        </button>
+    </div>
 </div>
 
-{{-- JavaScript for toggling password fields (Requirement 3) --}}
 @if (isset($user))
     <script>
         function showPasswordFields() {

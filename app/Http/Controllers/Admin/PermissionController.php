@@ -4,16 +4,18 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Permission\StorePermissionRequest;
-use App\Http\Requests\Admin\Permission\UpdatePermissionRequest; // Import the service
+use App\Http\Requests\Admin\Permission\UpdatePermissionRequest;
 use App\Services\PermissionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use NhanDev\Rbac\Models\Permission;
+use Spatie\Permission\Models\Permission;
 use Throwable;
 
 class PermissionController extends Controller
 {
-    // The controller now ONLY depends on the Service layer.
+    /**
+     * The service for handling permission business logic.
+     */
     protected PermissionService $permissionService;
 
     public function __construct(PermissionService $permissionService)
@@ -22,7 +24,7 @@ class PermissionController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Display a listing of the permissions.
      */
     public function index(): View
     {
@@ -31,7 +33,7 @@ class PermissionController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new permission.
      */
     public function create(): View
     {
@@ -39,7 +41,7 @@ class PermissionController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created permission in storage.
      */
     public function store(StorePermissionRequest $request): RedirectResponse
     {
@@ -48,12 +50,12 @@ class PermissionController extends Controller
             return redirect()->route('admin.permissions.index')->with('success', 'Permission created successfully.');
         } catch (Throwable $e) {
             report($e);
-            return back()->withInput()->with('error', 'There was an issue creating the permission. Please try again.');
+            return back()->withInput()->with('error', 'There was an issue creating the permission.');
         }
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified permission.
      */
     public function edit(Permission $permission): View
     {
@@ -61,7 +63,7 @@ class PermissionController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified permission in storage.
      */
     public function update(UpdatePermissionRequest $request, Permission $permission): RedirectResponse
     {
@@ -70,12 +72,12 @@ class PermissionController extends Controller
             return redirect()->route('admin.permissions.index')->with('success', 'Permission updated successfully.');
         } catch (Throwable $e) {
             report($e);
-            return back()->withInput()->with('error', 'There was an issue updating the permission. Please try again.');
+            return back()->withInput()->with('error', 'There was an issue updating the permission.');
         }
     }
 
     /**
-     * Toggle the status of the specified resource.
+     * Toggle the status of the specified permission.
      */
     public function toggleStatus(Permission $permission): RedirectResponse
     {
@@ -84,7 +86,7 @@ class PermissionController extends Controller
             return redirect()->route('admin.permissions.index')->with('success', 'Permission status updated successfully.');
         } catch (Throwable $e) {
             report($e);
-            return redirect()->route('admin.permissions.index')->with('error', $e->getMessage());
+            return back()->with('error', $e->getMessage());
         }
     }
 }

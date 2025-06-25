@@ -3,12 +3,17 @@
 @section('title', 'Create New Role')
 
 @section('content')
-    <div class="content-header">
-        <h1>Create New Role</h1>
-        <a href="{{ route('admin.roles.index') }}" class="btn btn-primary">Back to List</a>
-    </div>
+    <form
+        action="{{ route('admin.roles.store') }}"
+        method="POST"
+    >
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <div class="border-b border-gray-900/10 pb-6 mb-6">
+                <h2 class="text-base font-semibold leading-7 text-gray-900">Create a New Role</h2>
+                <p class="mt-1 text-sm leading-6 text-gray-600">Define a new role and assign permissions to it.</p>
+            </div>
 
-    <form action="{{ route('admin.roles.store') }}" method="POST">
-        @include('admin.roles._form', ['submitButtonText' => 'Create Role'])
+            @include('admin.roles._form', ['submitButtonText' => 'Create Role'])
+        </div>
     </form>
 @endsection

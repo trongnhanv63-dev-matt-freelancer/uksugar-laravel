@@ -3,114 +3,134 @@
 @section('title', 'Manage Roles')
 
 @section('content')
-    <div class="content-header">
-        <h1>Roles and Permissions</h1>
+    {{-- Page Header --}}
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Roles Management</h1>
         <a
             href="{{ route('admin.roles.create') }}"
-            class="btn btn-primary"
+            class="mt-4 sm:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors duration-200"
         >
             Create New Role
         </a>
     </div>
 
+    {{-- Session Messages --}}
     @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div
+            class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4"
+            role="alert"
+        >
+            <p>{{ session('success') }}</p>
+        </div>
     @endif
 
     @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+        <div
+            class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4"
+            role="alert"
+        >
+            <p>{{ session('error') }}</p>
+        </div>
     @endif
 
-    <table>
-        <thead>
-            <tr>
-                <th>Role Name</th>
-                <th>Display Name</th>
-                <th>Status</th>
-                <th>Permissions</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($roles as $role)
+    {{-- Roles Table --}}
+    <div class="bg-white shadow-md rounded-lg overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
-                    <td>{{ $role->name }}</td>
-                    <td>{{ $role->display_name }}</td>
-                    <td>
-                        <span
-                            style="
-                                color: {{ $role->status === config('rbac.role_statuses.active') ? 'green' : 'red' }};
-                            "
-                        >
-                            ● {{ ucfirst($role->status) }}
-                        </span>
-                    </td>
-                    <td>
-                        @if ($role->name === 'super-admin')
-                            <span style="font-style: italic; color: #6c757d">All Permissions</span>
-                        @else
-                            @foreach ($role->permissions->take(5) as $permission)
+                    <th
+                        scope="col"
+                        class="px-6 py-3"
+                    >
+                        Role Name
+                    </th>
+                    <th
+                        scope="col"
+                        class="px-6 py-3"
+                    >
+                        Permissions Count
+                    </th>
+                    <th
+                        scope="col"
+                        class="px-6 py-3"
+                    >
+                        Status
+                    </th>
+                    <th
+                        scope="col"
+                        class="px-6 py-3"
+                    >
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($roles as $role)
+                    <tr class="bg-white border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                            {{ $role->name }}
+                            @if ($role->name === 'super-admin')
+                                <span title="Super Admin">⭐</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full">
+                                {{ $role->permissions->count() }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            @if ($role->status === 'active')
                                 <span
-                                    style="
-                                        background-color: #e0e0e0;
-                                        padding: 2px 5px;
-                                        border-radius: 4px;
-                                        font-size: 0.8em;
-                                        margin-right: 5px;
-                                        white-space: nowrap;
-                                    "
+                                    class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full"
                                 >
-                                    {{ $permission->slug }}
+                                    Active
                                 </span>
-                            @endforeach
-
-                            @if ($role->permissions->count() > 5)
+                            @else
                                 <span
-                                    style="
-                                        background-color: #e0e0e0;
-                                        padding: 2px 5px;
-                                        border-radius: 4px;
-                                        font-size: 0.8em;
-                                    "
+                                    class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full"
                                 >
-                                    ...
+                                    Inactive
                                 </span>
                             @endif
-                        @endif
-                    </td>
-                    <td class="action-links">
-                        @if ($role->name !== 'super-admin')
-                            <a href="{{ route('admin.roles.edit', $role->id) }}">Edit</a>
+                        </td>
+                        <td class="px-6 py-4 flex items-center space-x-4">
                             @if ($role->name !== 'super-admin')
+                                <a
+                                    href="{{ route('admin.roles.edit', $role->id) }}"
+                                    class="font-medium text-indigo-600 hover:underline"
+                                >
+                                    Edit
+                                </a>
                                 <form
                                     method="POST"
                                     action="{{ route('admin.roles.toggleStatus', $role->id) }}"
-                                    style="display: inline"
                                     onsubmit="return confirm('Are you sure you want to change this role\'s status?');"
                                 >
                                     @csrf
                                     @method('PATCH')
                                     <button
                                         type="submit"
-                                        class="delete-btn"
-                                        style="
-                                            color: {{ $role->status === config('rbac.role_statuses.active') ? 'orange' : 'green' }};
-                                        "
+                                        class="font-medium hover:underline {{ $role->status === 'active' ? 'text-yellow-600' : 'text-green-600' }}"
                                     >
-                                        {{ $role->status === config('rbac.role_statuses.active') ? 'Deactivate' : 'Activate' }}
+                                        {{ $role->status === 'active' ? 'Deactivate' : 'Activate' }}
                                     </button>
                                 </form>
+                            @else
+                                <span class="text-gray-400">Protected</span>
                             @endif
-                        @else
-                            <span style="color: #6c757d">(Protected)</span>
-                        @endif
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5">No roles found.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+                        </td>
+                    </tr>
+                @empty
+                    <tr class="bg-white border-b">
+                        <td
+                            colspan="4"
+                            class="px-6 py-4 text-center text-gray-500"
+                        >
+                            No roles found.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 @endsection

@@ -4,8 +4,6 @@ use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Auth\LoginController as PublicLoginController;
-use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Route; // Import the middleware class
 
 /*
@@ -66,20 +64,3 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // PUBLIC ROUTES
 //==========================================================================
 Route::get('/', function () { return view('welcome'); })->name('home');
-
-Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-    Route::post('register', [RegisterController::class, 'register']);
-
-    Route::get('login', [PublicLoginController::class, 'showLoginForm'])->name('login');
-    Route::post('login', [PublicLoginController::class, 'login']);
-});
-
-Route::middleware('auth')->group(function () {
-    Route::post('logout', [PublicLoginController::class, 'logout'])->name('logout');
-
-    Route::get('/dashboard', function () {
-        return 'Welcome to your public dashboard, ' . auth()->user()->name . '!';
-    })->name('dashboard');
-
-});

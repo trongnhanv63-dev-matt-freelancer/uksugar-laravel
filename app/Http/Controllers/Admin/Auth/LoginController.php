@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginRequest;
+use App\Http\Requests\LoginRequest; // Assuming you have a LoginRequest
 use App\Services\AuthService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,7 +24,6 @@ class LoginController extends Controller
      */
     public function showLoginForm(): View
     {
-        // Point to a new view for the admin login
         return view('admin.auth.login');
     }
 
@@ -33,30 +32,31 @@ class LoginController extends Controller
      */
     public function login(LoginRequest $request): RedirectResponse
     {
+        // 1. Data is validated by LoginRequest.
         $credentials = $request->only('email', 'password');
         $remember = $request->boolean('remember');
 
+        // 2. Call the service to attempt authentication.
         $isAuthenticated = $this->authService->attemptLogin($credentials, $remember);
 
+        // 3. If authentication is successful, proceed to authorization.
         if ($isAuthenticated) {
-            // --- CRITICAL CHANGE HERE ---
-            // Instead of checking for a specific role, we now check for a permission.
-            // The hasPermissionTo() method already handles the super-admin override.
-            if (auth()->user()->hasPermissionTo('admin.panel.access')) {
+            // 4. Authorize: Check if the now-authenticated user has permission to access the panel.
+            // The 'can' helper uses the Gate we defined in AuthServiceProvider.
+            if ($request->user()->can('admin.panel.access')) {
                 $request->session()->regenerate();
                 return redirect()->intended(route('admin.dashboard'));
             }
 
-            // If a user logs in but doesn't have panel access, log them out.
+            // If they are a valid user but not an admin, log them out immediately.
             Auth::logout();
         }
 
-        // If login fails or user lacks permission, redirect back.
+        // If authentication or authorization fails, redirect back with a generic error.
         return back()->withErrors([
-            'email' => 'These credentials are not valid for an administrator or you lack necessary permissions.',
+            'email' => 'The provided credentials do not match our records or you do not have access.',
         ])->onlyInput('email');
     }
-
 
     /**
      * Log the admin user out.
@@ -66,8 +66,6 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        // Redirect to the admin login page after logout
         return redirect()->route('admin.login');
     }
 }

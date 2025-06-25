@@ -2,26 +2,26 @@
 
 namespace App\Repositories\Contracts;
 
-use Illuminate\Database\Eloquent\Collection;
 use App\Models\Permission;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Interface for the Permission repository.
+ * Defines the contract for data access operations for Permissions.
  */
 interface PermissionRepositoryInterface
 {
     /**
-     * Get all permissions.
+     * Get all permissions, typically for display.
      * @return Collection<int, Permission>
      */
     public function getAll(): Collection;
 
     /**
-     * Create a new permission.
-     * @param array<string, string> $attributes
-     * @return Permission
+     * Get all active permissions.
+     * @return Collection<int, Permission>
      */
-    public function create(array $attributes): Permission;
+    public function getAllActive(): Collection;
 
     /**
      * Find a permission by its ID.
@@ -31,17 +31,17 @@ interface PermissionRepositoryInterface
     public function findById(int $id): ?Permission;
 
     /**
-     * Update an existing permission.
+     * Create a new permission.
+     * @param array<string, mixed> $attributes
+     * @return Permission
+     */
+    public function create(array $attributes): Permission;
+
+    /**
+     * Update an existing permission's attributes.
      * @param int $id
-     * @param array<string, string> $attributes
+     * @param array<string, mixed> $attributes
      * @return Permission
      */
     public function update(int $id, array $attributes): Permission;
-
-    /**
-     * Delete a permission by its ID.
-     * @param int $id
-     * @return bool
-     */
-    public function delete(int $id): bool;
 }
