@@ -5,6 +5,8 @@ namespace NhanDev\Rbac\Services;
 use Illuminate\Database\Eloquent\Collection;
 use NhanDev\Rbac\Models\Permission;
 use NhanDev\Rbac\Repositories\Contracts\PermissionRepositoryInterface;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 /**
  * Service class for handling Permission-related business logic.
@@ -36,7 +38,9 @@ class PermissionService
      */
     public function createNewPermission(array $data): Permission
     {
-        return $this->permissionRepository->create($data);
+        return DB::transaction(function () use ($data) {
+            return $this->permissionRepository->create($data);
+        });
     }
 
     /**
@@ -48,7 +52,9 @@ class PermissionService
      */
     public function updatePermission(int $permissionId, array $data): Permission
     {
-        return $this->permissionRepository->update($permissionId, $data);
+        return DB::transaction(function () use ($permissionId, $data) {
+            return $this->permissionRepository->update($permissionId, $data);
+        });
     }
 
     /**
@@ -59,13 +65,16 @@ class PermissionService
      */
     public function togglePermissionStatus(int $permissionId): Permission
     {
-        $permission = $this->permissionRepository->findById($permissionId);
+        return DB::transaction(function () use ($permissionId) {
+            $permission = $this->permissionRepository->findById($permissionId);
 
-        $newStatus = $permission->status === config('rbac.permission_statuses.active') ? config('rbac.permission_statuses.inactive') : config('rbac.permission_statuses.active');
+            $newStatus = $permission->status === config('rbac.permission_statuses.active')
+                ? config('rbac.permission_statuses.inactive')
+                : config('rbac.permission_statuses.active');
 
-        $this->permissionRepository->update($permissionId, ['status' => $newStatus]);
+            $this->permissionRepository->update($permissionId, ['status' => $newStatus]);
 
-        // Return a fresh instance from the database to ensure consistency
-        return $permission->fresh();
+            return $permission->fresh();
+        });
     }
 }

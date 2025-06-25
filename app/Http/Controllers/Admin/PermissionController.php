@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse; // Import the service
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use NhanDev\Rbac\Models\Permission;
+use Throwable;
 
 class PermissionController extends Controller
 {
@@ -46,10 +47,13 @@ class PermissionController extends Controller
             'description' => 'nullable|string|max:255',
         ]);
 
-        $this->permissionService->createNewPermission($validated);
-
-        return redirect()->route('admin.permissions.index')
-                         ->with('success', 'Permission created successfully.');
+        try {
+            $this->permissionService->createNewPermission($validated);
+            return redirect()->route('admin.permissions.index')->with('success', 'Permission created successfully.');
+        } catch (Throwable $e) {
+            report($e);
+            return back()->withInput()->with('error', 'There was an issue creating the permission. Please try again.');
+        }
     }
 
     /**
@@ -70,10 +74,13 @@ class PermissionController extends Controller
             'description' => 'nullable|string|max:255',
         ]);
 
-        $this->permissionService->updatePermission($permission->id, $validated);
-
-        return redirect()->route('admin.permissions.index')
-                         ->with('success', 'Permission updated successfully.');
+        try {
+            $this->permissionService->updatePermission($permission->id, $validated);
+            return redirect()->route('admin.permissions.index')->with('success', 'Permission updated successfully.');
+        } catch (Throwable $e) {
+            report($e);
+            return back()->withInput()->with('error', 'There was an issue updating the permission. Please try again.');
+        }
     }
 
     /**
@@ -81,7 +88,12 @@ class PermissionController extends Controller
      */
     public function toggleStatus(Permission $permission): RedirectResponse
     {
-        $this->permissionService->togglePermissionStatus($permission->id);
-        return redirect()->route('admin.permissions.index')->with('success', 'Permission status updated successfully.');
+        try {
+            $this->permissionService->togglePermissionStatus($permission->id);
+            return redirect()->route('admin.permissions.index')->with('success', 'Permission status updated successfully.');
+        } catch (Throwable $e) {
+            report($e);
+            return redirect()->route('admin.permissions.index')->with('error', $e->getMessage());
+        }
     }
 }

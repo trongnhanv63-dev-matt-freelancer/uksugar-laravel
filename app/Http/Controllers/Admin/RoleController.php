@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use NhanDev\Rbac\Models\Role;
+use Throwable;
 
 class RoleController extends Controller
 {
@@ -40,8 +41,18 @@ class RoleController extends Controller
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,id',
         ]);
-        $this->roleService->createNewRole($validatedData);
-        return redirect()->route('admin.roles.index')->with('success', 'Role created successfully.');
+
+        try {
+            $this->roleService->createNewRole($validatedData);
+            return redirect()->route('admin.roles.index')->with('success', 'Role created successfully.');
+        } catch (Throwable $e) {
+            // Log the detailed error for the developer
+            report($e);
+            // Redirect back with a user-friendly error message
+            return back()->withInput()->with('error', 'There was an issue creating the role. Please try again.');
+        }
+
+
     }
 
     public function edit(Role $role): View
@@ -60,10 +71,17 @@ class RoleController extends Controller
             'permissions.*' => 'exists:permissions,id',
         ]);
 
-        $this->roleService->updateExistingRole($role->id, $validatedData);
+        try {
+            $this->roleService->updateExistingRole($role->id, $validatedData);
+            return redirect()->route('admin.roles.index')
+                             ->with('success', 'Role updated successfully.');
+        } catch (Throwable $e) {
+            // Log the detailed error for the developer
+            report($e);
+            // Redirect back with a user-friendly error message
+            return back()->withInput()->with('error', 'There was an issue updating the role. Please try again.');
+        }
 
-        return redirect()->route('admin.roles.index')
-                         ->with('success', 'Role updated successfully.');
     }
 
     public function toggleStatus(Role $role): RedirectResponse
@@ -72,6 +90,9 @@ class RoleController extends Controller
             $this->roleService->toggleRoleStatus($role->id);
             return redirect()->route('admin.roles.index')->with('success', 'Role status updated successfully.');
         } catch (Exception $e) {
+            // Log the detailed error for the developer
+            report($e);
+            // Redirect back with a user-friendly error message
             return redirect()->route('admin.roles.index')->with('error', $e->getMessage());
         }
     }

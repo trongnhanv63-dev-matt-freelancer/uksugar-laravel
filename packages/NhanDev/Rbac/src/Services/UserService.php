@@ -6,9 +6,11 @@ use App\Models\User;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use NhanDev\Rbac\Repositories\Contracts\RoleRepositoryInterface;
 use NhanDev\Rbac\Repositories\Contracts\UserRepositoryInterface;
 use NhanDev\Rbac\Services\Concerns\LogsRelationshipChanges;
+use Throwable;
 
 class UserService
 {
@@ -39,41 +41,61 @@ class UserService
     // ... (createNewUser, updateUser, and toggleUserStatus methods remain the same) ...
     public function createNewUser(array $data): User
     {
-        $user = $this->userRepository->create(
-            Arr::except($data, ['roles'])
-        );
+        return DB::transaction(function () use ($data) {
+            $user = $this->userRepository->create(
+                Arr::except($data, ['roles'])
+            );
 
-        if (!empty($data['roles'])) {
-            $user->roles()->sync($data['roles']);
-        }
+            if (!empty($data['roles'])) {
+                $user->roles()->sync($data['roles']);
+            }
 
-        return $user;
+            return $user;
+        });
     }
 
     public function updateUser(int $userId, array $data): User
     {
-        if (empty($data['password'])) {
-            unset($data['password']);
-        }
+        return DB::transaction(function () use ($userId, $data) {
+            if (empty($data['password'])) {
+                unset($data['password']);
+            }
 
-        $userToUpdate = $this->userRepository->findById($userId);
+            $userToUpdate = $this->userRepository->findById($userId);
 
-        // Add this check
-        if ($userToUpdate->is_super_admin) {
-            throw new Exception('The Super Admin user cannot be modified.');
-        }
+            if ($userToUpdate->is_super_admin) {
+                throw new Exception('The Super Admin user cannot be modified.');
+            }
 
-        $user = $this->userRepository->update($userId, Arr::except($data, ['roles']));
+            $user = $this->userRepository->update($userId, Arr::except($data, ['roles']));
 
-        if (isset($data['roles'])) {
-            $changes = $user->roles()->sync($data['roles']);
-            // Call the logging method from the trait
-            $this->logSyncActivity($user, "Updated roles for user '{$user->username}'", $changes);
+            if (isset($data['roles'])) {
+                $changes = $user->roles()->sync($data['roles']);
+                $this->logSyncActivity($user, "Updated roles for user '{$user->username}'", $changes);
+            } else {
+                $user->roles()->sync([]);
+            }
 
-        } else {
-            $user->roles()->sync([]);
-        }
+            return $user;
+        });
+    }
 
-        return $user;
+    public function toggleUserStatus(int $userId): User
+    {
+        return DB::transaction(function () use ($userId) {
+            $user = $this->userRepository->findById($userId);
+
+            if ($user->is_super_admin) {
+                throw new Exception('The Super Admin user status cannot be changed.');
+            }
+
+            $newStatus = $user->status === config('rbac.user_statuses.active')
+                ? config('rbac.user_statuses.inactive')
+                : config('rbac.user_statuses.active');
+
+            $this->userRepository->update($userId, ['status' => $newStatus]);
+
+            return $user->fresh();
+        });
     }
 }

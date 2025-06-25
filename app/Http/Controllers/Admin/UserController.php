@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
+use Throwable;
 
 class UserController extends Controller
 {
@@ -55,9 +56,13 @@ class UserController extends Controller
             'status' => ['required', 'string'],
         ]);
 
-        $this->userService->createNewUser($validated);
-
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        try {
+            $this->userService->createNewUser($validated);
+            return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        } catch (Throwable $e) {
+            report($e);
+            return back()->withInput()->with('error', 'There was an issue creating the user. Please try again.');
+        }
     }
 
     /**
@@ -84,8 +89,23 @@ class UserController extends Controller
             'status' => ['required', 'string'],
         ]);
 
-        $this->userService->updateUser($user->id, $validated);
+        try {
+            $this->userService->updateUser($user->id, $validated);
+            return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        } catch (Throwable $e) {
+            report($e);
+            return back()->withInput()->with('error', 'There was an issue updating the user. Please try again.');
+        }
+    }
 
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+    public function toggleStatus(User $user): RedirectResponse
+    {
+        try {
+            $this->userService->toggleUserStatus($user->id);
+            return redirect()->route('admin.users.index')->with('success', 'User status updated successfully.');
+        } catch (Throwable $e) {
+            report($e);
+            return redirect()->route('admin.users.index')->with('error', $e->getMessage());
+        }
     }
 }
