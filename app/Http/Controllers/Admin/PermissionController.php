@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Permission\StorePermissionRequest;
+use App\Http\Requests\Admin\Permission\UpdatePermissionRequest; // Import the service
 use App\Services\PermissionService;
-use Illuminate\Http\RedirectResponse; // Import the service
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use NhanDev\Rbac\Models\Permission;
 use Throwable;
@@ -40,15 +41,10 @@ class PermissionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StorePermissionRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'slug' => 'required|string|unique:permissions,slug|max:100',
-            'description' => 'nullable|string|max:255',
-        ]);
-
         try {
-            $this->permissionService->createNewPermission($validated);
+            $this->permissionService->createNewPermission($request->validated());
             return redirect()->route('admin.permissions.index')->with('success', 'Permission created successfully.');
         } catch (Throwable $e) {
             report($e);
@@ -67,15 +63,10 @@ class PermissionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Permission $permission): RedirectResponse
+    public function update(UpdatePermissionRequest $request, Permission $permission): RedirectResponse
     {
-        $validated = $request->validate([
-            'slug' => 'required|string|max:100|unique:permissions,slug,' . $permission->id,
-            'description' => 'nullable|string|max:255',
-        ]);
-
         try {
-            $this->permissionService->updatePermission($permission->id, $validated);
+            $this->permissionService->updatePermission($permission->id, $request->validated());
             return redirect()->route('admin.permissions.index')->with('success', 'Permission updated successfully.');
         } catch (Throwable $e) {
             report($e);

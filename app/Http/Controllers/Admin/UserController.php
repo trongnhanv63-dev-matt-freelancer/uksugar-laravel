@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\User\StoreUserRequest;
+use App\Http\Requests\Admin\User\UpdateUserRequest; // We only need the service now
 use App\Models\User;
-use App\Services\UserService; // We only need the service now
+use App\Services\UserService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 use Throwable;
 
@@ -44,20 +44,10 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreUserRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            // 'username' => ['required', 'string', 'max:100', 'unique:users,username'],
-            'name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'string', 'email', 'max:100', 'unique:users,email'],
-            'password' => ['required', 'string', Password::min(8)->mixedCase()->numbers()->symbols()->uncompromised()],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['exists:roles,id'],
-            'status' => ['required', 'string'],
-        ]);
-
         try {
-            $this->userService->createNewUser($validated);
+            $this->userService->createNewUser($request->validated());
             return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
         } catch (Throwable $e) {
             report($e);
@@ -77,20 +67,10 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user): RedirectResponse
+    public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
-        $validated = $request->validate([
-            // 'username' => ['required', 'string', 'max:100', 'unique:users,username,' . $user->id],
-            'name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'string', 'email', 'max:100', 'unique:users,email,' . $user->id],
-            'password' => ['nullable', 'string', Password::min(8)->symbols()->mixedCase()->numbers()->uncompromised()],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['exists:roles,id'],
-            'status' => ['required', 'string'],
-        ]);
-
         try {
-            $this->userService->updateUser($user->id, $validated);
+            $this->userService->updateUser($user->id, $request->validated());
             return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
         } catch (Throwable $e) {
             report($e);
