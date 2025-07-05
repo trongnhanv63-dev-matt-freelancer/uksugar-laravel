@@ -15,13 +15,30 @@
 @endif
 
 @php
-    // Determine if the user being edited is protected (is a super-admin)
-    // We will handle the "self-edit" case via policy or in the controller if needed.
     $isProtectedUser = isset($user) && $user->hasRole('super-admin');
 @endphp
 
 <div class="space-y-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <label
+                for="name"
+                class="block text-sm font-medium leading-6 text-gray-900"
+            >
+                Full Name
+            </label>
+            <div class="mt-2">
+                <input
+                    type="text"
+                    name="name"
+                    id="name"
+                    value="{{ old('name', $user->name ?? '') }}"
+                    required
+                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+            </div>
+        </div>
+
         <div>
             <label
                 for="username"
@@ -40,24 +57,24 @@
                 />
             </div>
         </div>
+    </div>
 
-        <div>
-            <label
-                for="email"
-                class="block text-sm font-medium leading-6 text-gray-900"
-            >
-                Email
-            </label>
-            <div class="mt-2">
-                <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    value="{{ old('email', $user->email ?? '') }}"
-                    required
-                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-            </div>
+    <div>
+        <label
+            for="email"
+            class="block text-sm font-medium leading-6 text-gray-900"
+        >
+            Email
+        </label>
+        <div class="mt-2">
+            <input
+                type="email"
+                name="email"
+                id="email"
+                value="{{ old('email', $user->email ?? '') }}"
+                required
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
         </div>
     </div>
 

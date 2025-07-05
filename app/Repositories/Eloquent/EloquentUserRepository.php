@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -74,5 +75,44 @@ class EloquentUserRepository implements UserRepositoryInterface
         }
         // Return a fresh instance to ensure the returned model has the latest data.
         return $user->fresh();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaginatedUsers(array $filters = [], int $perPage = 20): LengthAwarePaginator
+    {
+        $query = User::with('roles');
+
+        // Apply search filter for name or username
+        if (!empty($filters['search'])) {
+            $searchTerm = $filters['search'];
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('username', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // Apply role filter
+        if (!empty($filters['role'])) {
+            $roleName = $filters['role'];
+            $query->whereHas('roles', fn ($q) => $q->where('name', $roleName));
+        }
+
+        // --- NEW: Apply status filter ---
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        // Apply sorting
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+        $sortDirection = $filters['sort_direction'] ?? 'desc';
+
+        // Prevent sorting by roles relationship to avoid errors
+        if ($sortBy !== 'roles') {
+            $query->orderBy($sortBy, $sortDirection);
+        }
+
+        return $query->paginate($perPage);
     }
 }

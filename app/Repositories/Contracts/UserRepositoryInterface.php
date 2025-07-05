@@ -3,7 +3,8 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection; // Import Paginator
 
 /**
  * Interface for the User repository.
@@ -50,4 +51,13 @@ interface UserRepositoryInterface
      * @return \App\Models\User
      */
     public function update(int $id, array $attributes): User;
+
+    /**
+     * Get a paginated list of users with dynamic filtering, searching, and sorting.
+     *
+     * @param array<string, mixed> $filters
+     * @param int $perPage
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getPaginatedUsers(array $filters = [], int $perPage = 20): LengthAwarePaginator;
 }

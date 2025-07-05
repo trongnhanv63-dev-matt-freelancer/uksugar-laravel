@@ -1,18 +1,29 @@
+/* 1. Import the standard Tailwind directives */
 @import 'tailwindcss';
 
-/* Các dòng @source này cho Tailwind biết cần quét file nào. Nó thay thế cho mục `content` trong file config cũ. */
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+/* 2. Define which files Tailwind should scan for classes */
 @source '../**/*.blade.php';
 @source '../**/*.js';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
+/* 3. Define your custom theme using CSS Custom Properties */
 @theme {
-    /* This is your existing font configuration */
+    /* Your existing font configuration */
     --font-sans:
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 
-    /* --- ADD YOUR CUSTOM COLOR HERE --- */
-    /* This defines a custom color named 'primary' */
-    --color-primary: #363439;
+    /* --- YOUR NEW SEMANTIC COLOR PALETTE --- */
+    --color-primary: #363439; /* Primary actions, buttons, headers */
+    --color-secondary: #272428; /* The main dark background/text color */
+    --color-accent: #af40f5; /* Purple for focus rings, highlights */
+    --color-success: #0ba91a; /* For success states, buttons */
+    --color-danger: #fd0303; /* For delete, logout, error messages */
+
+    --color-text-main: #615f64; /* Default body text color */
+    --color-text-button: #ffffff; /* Text color on dark buttons */
+
+    --color-bg-base: #f8f9fa; /* Main light background, slightly off-white */
+    --color-bg-input: #f0f0f3; /* Input field background */
+    --color-border-input: #dfdfdf; /* Input field border */
 }

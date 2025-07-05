@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
@@ -20,17 +21,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('login', [AdminLoginController::class, 'showLoginForm'])->name('login');
         Route::post('login', [AdminLoginController::class, 'login']);
-
     });
 
     // Protected Admin Area using the full class name for the middleware.
     Route::middleware(['auth', 'can:admin.panel.access'])->group(function () {
         Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
-
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
-
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::controller(RoleController::class)->prefix('roles')->name('roles.')->group(function () {
             Route::get('/', 'index')->name('index')->middleware('can:roles.view');
             Route::get('/create', 'create')->name('create')->middleware('can:roles.create');
@@ -39,7 +35,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::put('/{role}', 'update')->name('update')->middleware('can:roles.edit');
             Route::patch('/{role}/toggle-status', 'toggleStatus')->name('toggleStatus')->middleware('can:roles.edit');
         });
-
         Route::controller(PermissionController::class)->prefix('permissions')->name('permissions.')->group(function () {
             Route::get('/', 'index')->name('index')->middleware('can:permissions.view');
             Route::get('/create', 'create')->name('create')->middleware('can:permissions.create');
@@ -48,7 +43,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::put('/{permission}', 'update')->name('update')->middleware('can:permissions.edit');
             Route::patch('/{permission}/toggle-status', 'toggleStatus')->name('toggleStatus')->middleware('can:permissions.edit');
         });
-
         Route::controller(UserController::class)->prefix('users')->name('users.')->group(function () {
             Route::get('/', 'index')->name('index')->middleware('can:users.view');
             Route::get('/create', 'create')->name('create')->middleware('can:users.create');

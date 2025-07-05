@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -27,11 +28,15 @@ class UserService
     }
 
     /**
-     * Get all users for the index page.
-     */
-    public function getUsersForIndex(): Collection
+        * Get users for the index page with filtering and pagination.
+        *
+        * @param array<string, mixed> $filters
+        * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+        */
+    public function getUsersForIndex(array $filters): LengthAwarePaginator
     {
-        return $this->userRepository->getAllWithRoles();
+        // We can add more business logic here in the future if needed
+        return $this->userRepository->getPaginatedUsers($filters);
     }
 
     /**

@@ -43,6 +43,10 @@ class AuthService
         ) {
             // 3. If all checks pass, log the user in using Laravel's Auth facade.
             Auth::login($user, $remember);
+
+            // Update the last login timestamp after successful authentication.
+            $this->userRepository->update($user->id, ['last_login_at' => now()]);
+
             return true;
         }
 

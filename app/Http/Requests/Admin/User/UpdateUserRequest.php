@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests\Admin\User;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -17,6 +18,7 @@ class UpdateUserRequest extends FormRequest
         $userId = is_object($user) ? $user->id : $user;
         return [
             'name' => ['required', 'string', 'max:100'],
+            'username' => ['required', 'string', 'max:20', 'unique:users,username,' . $userId],
             'email' => ['required', 'string', 'email', 'max:100', 'unique:users,email,' . $userId],
             'password' => ['nullable', 'string', Password::min(8)->symbols()->mixedCase()->numbers()->uncompromised()],
             'roles' => ['nullable', 'array'],
@@ -24,4 +26,4 @@ class UpdateUserRequest extends FormRequest
             'status' => ['required', 'string'],
         ];
     }
-} 
+}
