@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(({ mode }) => {
     // Load env variables based on the current mode (development, production)
-    const env = loadEnv(mode, process.cwd(), ''); //console.log({ env })
+    const env = loadEnv(mode, process.cwd(), '');
     return {
         plugins: [
             laravel({

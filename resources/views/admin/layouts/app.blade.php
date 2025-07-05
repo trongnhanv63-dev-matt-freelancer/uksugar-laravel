@@ -6,13 +6,13 @@
             name="viewport"
             content="width=device-width, initial-scale=1.0"
         />
-        <title>Admin Dashboard</title>
+        <title>@yield('title')</title>
 
         {{--
             File: resources/views/layouts/admin.blade.php
             Description: Main admin layout file with a header, a toggleable sidebar, and a content area.
         --}}
-        @vite('resources/css/app.css')
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="bg-bg-base font-sans text-sm antialiased">
         <div class="flex h-screen bg-bg-base">
@@ -32,7 +32,7 @@
                         Response: An HTML anchor tag for the menu.
                     --}}
                     <a
-                        href="#"
+                        href="{{ route('admin.dashboard') }}"
                         class="flex items-center px-6 py-3 text-white bg-secondary bg-opacity-25"
                     >
                         <svg
@@ -52,7 +52,7 @@
                         <span>Dashboard</span>
                     </a>
                     <a
-                        href="#"
+                        href="{{ route('admin.users.index') }}"
                         class="flex items-center px-6 py-3 text-white hover:bg-secondary hover:bg-opacity-25 transition-colors duration-200"
                     >
                         <svg
@@ -72,7 +72,7 @@
                         <span>User Management</span>
                     </a>
                     <a
-                        href="#"
+                        href="{{ route('admin.roles.index') }}"
                         class="flex items-center px-6 py-3 text-white hover:bg-secondary hover:bg-opacity-25 transition-colors duration-200"
                     >
                         <svg
@@ -92,7 +92,7 @@
                         <span>Role Management</span>
                     </a>
                     <a
-                        href="#"
+                        href="{{ route('admin.permissions.index') }}"
                         class="flex items-center px-6 py-3 text-white hover:bg-secondary hover:bg-opacity-25 transition-colors duration-200"
                     >
                         <svg
@@ -162,15 +162,7 @@
                 </header>
 
                 <main class="flex-1 overflow-x-hidden overflow-y-auto bg-bg-base p-6">
-                    <div class="container mx-auto">
-                        <h2 class="text-2xl font-semibold text-secondary">Dashboard</h2>
-                        <p class="text-text-main mt-2">Welcome to your admin dashboard. Your content goes here.</p>
-
-                        <div class="mt-6 bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-medium text-secondary">Stats</h3>
-                            <div class="border-t border-border-input mt-4 pt-4"></div>
-                        </div>
-                    </div>
+                    @yield('content')
                 </main>
             </div>
         </div>
