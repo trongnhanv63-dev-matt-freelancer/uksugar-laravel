@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\DB;
 use NhanDev\Rbac\Repositories\Contracts\RoleRepositoryInterface;
 use NhanDev\Rbac\Repositories\Contracts\UserRepositoryInterface;
 use NhanDev\Rbac\Services\Concerns\LogsRelationshipChanges;
-use Throwable;
 
 class UserService
 {
