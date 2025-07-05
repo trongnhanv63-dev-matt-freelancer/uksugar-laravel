@@ -33,7 +33,7 @@
                         scope="col"
                         class="px-6 py-3"
                     >
-                        Permission Name (Slug)
+                        Permission Name
                     </th>
                     <th
                         scope="col"

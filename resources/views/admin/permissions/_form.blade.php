@@ -24,7 +24,7 @@
             for="name"
             class="block text-sm font-medium leading-6 text-gray-900"
         >
-            Permission Name (Slug)
+            Permission Name
         </label>
         <div class="mt-2">
             <input
