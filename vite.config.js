@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(({ mode }) => {
     // Load env variables based on the current mode (development, production)
-    const env = loadEnv(mode, process.cwd(), '');
+    const env = loadEnv(mode, process.cwd(), ''); //console.log({ env })
     return {
         plugins: [
             laravel({
@@ -14,17 +14,14 @@ export default defineConfig(({ mode }) => {
             tailwindcss(),
         ],
         server: {
-            host: env.VITE_HMR_HOST, // 'sugar.local'
+            host: 'localhost',
             port: 5173,
-            origin: `http://${env.VITE_HMR_HOST}:5173`, // ensure this matches what the browser expects
             strictPort: true,
-            cors: {
-                origin: `http://${env.VITE_HMR_HOST}`, // allow requests from your Laravel domain
-                credentials: true,
-            },
+            https: false, // <- Force HTTP
             hmr: {
-                host: env.VITE_HMR_HOST,
-                protocol: 'ws',
+                protocol: 'ws', // not wss
+                host: 'localhost',
+                port: 5173,
             },
         },
     };
