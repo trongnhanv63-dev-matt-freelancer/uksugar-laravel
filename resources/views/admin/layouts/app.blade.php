@@ -143,7 +143,7 @@
                         <div class="flex items-center">
                             <span class="mr-4">Welcome, {{ Auth::user()->name ?? 'Admin' }}</span>
                             <a
-                                href="{{ route('logout') }}"
+                                href="{{ route('admin.logout') }}"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                                 class="bg-danger text-text-button px-4 py-1.5 rounded-md hover:bg-opacity-80 transition-colors duration-200 text-xs font-bold uppercase"
                             >
@@ -151,7 +151,7 @@
                             </a>
                             <form
                                 id="logout-form"
-                                action="{{ route('logout') }}"
+                                action="{{ route('admin.logout') }}"
                                 method="POST"
                                 class="hidden"
                             >

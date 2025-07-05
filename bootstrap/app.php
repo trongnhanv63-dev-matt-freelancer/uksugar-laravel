@@ -28,6 +28,6 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             // For all other unauthenticated requests, redirect to the public login page
-            return redirect()->guest(route('login'));
+            return redirect()->guest(route('admin.login'));
         });
     })->create();

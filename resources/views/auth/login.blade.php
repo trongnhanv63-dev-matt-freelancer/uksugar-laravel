@@ -71,7 +71,7 @@
     <body>
         <form
             method="POST"
-            action="{{ route('login') }}"
+            action="{{ route('admin.login') }}"
         >
             @csrf
 

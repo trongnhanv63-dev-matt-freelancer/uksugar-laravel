@@ -14,6 +14,7 @@ class SuperAdminSeeder extends Seeder
             ['email' => 'superadmin@example.com'],
             [
                 'name' => 'Super Admin',
+                'username' => 'super_admin',
                 'password' => bcrypt('password'), // Use bcrypt() helper
                 'status' => 'active',
                 'email_verified_at' => now(),
