@@ -27,10 +27,9 @@ class UpdateRoleRequest extends FormRequest
 
         return [
             // 'name' is read-only, so we don't validate it here.
-            'display_name' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:255'],
             'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['exists:permissions,id'],
+            'permissions.*' => ['exists:permissions,name'],
         ];
     }
 }
