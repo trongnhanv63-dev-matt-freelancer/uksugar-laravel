@@ -39,9 +39,9 @@ interface RoleRepositoryInterface
 
     /**
      * Update an existing role's attributes.
-     * @param int $id
+     * @param \App\Models\Role $role
      * @param array<string, mixed> $attributes
-     * @return Role
+     * @return \App\Models\Role
      */
-    public function update(int $id, array $attributes): Role;
+    public function update(Role $role, array $attributes): Role;
 }

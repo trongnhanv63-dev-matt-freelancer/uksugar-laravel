@@ -46,11 +46,11 @@ interface UserRepositoryInterface
     /**
      * Update an existing user's attributes.
      *
-     * @param int $id
+     * @param \App\Models\User $user
      * @param array<string, mixed> $attributes
      * @return \App\Models\User
      */
-    public function update(int $id, array $attributes): User;
+    public function update(User $user, array $attributes): User;
 
     /**
      * Get a paginated list of users with dynamic filtering, searching, and sorting.

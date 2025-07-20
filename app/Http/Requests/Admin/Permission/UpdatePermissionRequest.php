@@ -13,8 +13,7 @@ class UpdatePermissionRequest extends FormRequest
 
     public function rules(): array
     {
-        $permission = $this->route('permission');
-        $permissionId = is_object($permission) ? $permission->id : $permission;
+        $permissionId = $this->route('permission')->id;
         return [
             'name' => ['required', 'string', 'max:100', 'unique:permissions,name,' . $permissionId],
             'description' => ['nullable', 'string', 'max:255'],

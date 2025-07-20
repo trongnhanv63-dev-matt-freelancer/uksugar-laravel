@@ -46,7 +46,8 @@ class PermissionService
     public function updatePermission(int $permissionId, array $data): Permission
     {
         return DB::transaction(function () use ($permissionId, $data) {
-            return $this->permissionRepository->update($permissionId, $data);
+            $permission = $this->permissionRepository->findById($permissionId);
+            return $this->permissionRepository->update($permission, $data);
         });
     }
 
@@ -61,7 +62,7 @@ class PermissionService
 
             $newStatus = $permission->status === 'active' ? 'inactive' : 'active';
 
-            return $this->permissionRepository->update($permissionId, ['status' => $newStatus]);
+            return $this->permissionRepository->update($permission, ['status' => $newStatus]);
         });
     }
 }

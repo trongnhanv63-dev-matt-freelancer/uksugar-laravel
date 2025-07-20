@@ -87,7 +87,7 @@ class UserService
             }
 
             // Update user attributes
-            $this->userRepository->update($userId, Arr::except($data, ['roles']));
+            $this->userRepository->update($user, Arr::except($data, ['roles']));
 
             // Sync roles
             // The `syncRoles` method comes from the Spatie package.

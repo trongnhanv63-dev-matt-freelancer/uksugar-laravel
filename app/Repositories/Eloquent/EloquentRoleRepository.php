@@ -16,7 +16,7 @@ class EloquentRoleRepository implements RoleRepositoryInterface
      */
     public function getAllWithPermissions(): Collection
     {
-        return Role::with('permissions')->latest('id')->get();
+        return Role::with('permissions')->latest()->get();
     }
 
     /**
@@ -46,12 +46,9 @@ class EloquentRoleRepository implements RoleRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function update(int $id, array $attributes): Role
+    public function update(Role $role, array $attributes): Role
     {
-        $role = $this->findById($id);
-        if ($role) {
-            $role->update($attributes);
-        }
+        $role->update($attributes);
         return $role;
     }
 }

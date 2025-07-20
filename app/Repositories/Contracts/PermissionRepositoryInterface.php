@@ -39,9 +39,9 @@ interface PermissionRepositoryInterface
 
     /**
      * Update an existing permission's attributes.
-     * @param int $id
+     * @param \App\Models\Permission $permission
      * @param array<string, mixed> $attributes
-     * @return Permission
+     * @return \App\Models\Permission
      */
-    public function update(int $id, array $attributes): Permission;
+    public function update(Permission $permission, array $attributes): Permission;
 }

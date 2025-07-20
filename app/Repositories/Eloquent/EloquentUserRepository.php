@@ -37,7 +37,7 @@ class EloquentUserRepository implements UserRepositoryInterface
     {
         // Eager load the 'roles' relationship to prevent N+1 query problems on the index page.
         // Order by the latest created users.
-        return $this->model->with('roles')->latest('id')->get();
+        return $this->model->with('roles')->latest()->get();
     }
 
     /**
@@ -67,12 +67,9 @@ class EloquentUserRepository implements UserRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function update(int $id, array $attributes): User
+    public function update(User $user, array $attributes): User
     {
-        $user = $this->findById($id);
-        if ($user) {
-            $user->update($attributes);
-        }
+        $user->update($attributes);
         // Return a fresh instance to ensure the returned model has the latest data.
         return $user->fresh();
     }

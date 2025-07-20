@@ -83,7 +83,7 @@ class RoleService
             }
 
             // Update the role's main attributes
-            $this->roleRepository->update($roleId, Arr::except($data, ['permissions']));
+            $this->roleRepository->update($role, Arr::except($data, ['permissions']));
 
             // Use Spatie's method to sync permissions
             $role->syncPermissions($data['permissions'] ?? []);
@@ -108,7 +108,7 @@ class RoleService
 
             $newStatus = $role->status === 'active' ? 'inactive' : 'active';
 
-            return $this->roleRepository->update($roleId, ['status' => $newStatus]);
+            return $this->roleRepository->update($role, ['status' => $newStatus]);
         });
     }
 }

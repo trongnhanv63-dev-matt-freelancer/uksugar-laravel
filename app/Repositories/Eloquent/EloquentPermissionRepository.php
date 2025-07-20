@@ -16,7 +16,7 @@ class EloquentPermissionRepository implements PermissionRepositoryInterface
      */
     public function getAll(): Collection
     {
-        return Permission::latest('id')->get();
+        return Permission::latest()->get();
     }
 
     /**
@@ -46,12 +46,9 @@ class EloquentPermissionRepository implements PermissionRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function update(int $id, array $attributes): Permission
+    public function update(Permission $permission, array $attributes): Permission
     {
-        $permission = $this->findById($id);
-        if ($permission) {
-            $permission->update($attributes);
-        }
+        $permission->update($attributes);
         return $permission;
     }
 }
