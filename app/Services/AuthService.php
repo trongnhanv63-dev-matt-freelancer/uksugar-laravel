@@ -45,7 +45,7 @@ class AuthService
             Auth::login($user, $remember);
 
             // Update the last login timestamp after successful authentication.
-            $this->userRepository->update($user->id, ['last_login_at' => now()]);
+            $this->userRepository->update($user, ['last_login_at' => now()]);
 
             return true;
         }

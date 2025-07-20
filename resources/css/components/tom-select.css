@@ -1,0 +1,57 @@
+/*
+ * File: resources/css/components/tom-select.css
+ * Description: High-fidelity custom styles meticulously crafted to PERFECTLY mimic
+ * the project's standard input fields based on the provided Tailwind classes.
+ */
+
+/*
+ * This is the main container that Tom Select generates (.ts-control).
+ * We apply the core styles here.
+ */
+.ts-control {
+  background: red;
+  border-radius: 0.375rem !important; /* from: rounded-md */
+  border: none !important; /* from: border-0 */
+  padding-top: 0.5rem !important; /* from: py-2 */
+  padding-bottom: 0.5rem !important; /* from: py-2 */
+  padding-left: 0.75rem !important; /* from: px-3 */
+  padding-right: 0.75rem !important; /* from: px-3 */
+
+  /* This section meticulously replicates Tailwind's ring utilities */
+  --tw-ring-inset: inset;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(209 213 219); /* from: ring-gray-300 */
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color); /* from: ring-1 ring-inset */
+  box-shadow:
+    var(--tw-ring-offset-shadow),
+    var(--tw-ring-shadow),
+    0 1px 2px 0 rgb(0 0 0 / 0.05) !important; /* combines ring and shadow-sm */
+}
+
+/*
+ * This class is added by Tom Select when the control is focused.
+ * We use it to replicate the focus:ring-2 and focus:ring-black behavior.
+ */
+.ts-control.focus {
+  --tw-ring-color: black !important; /* from: focus:ring-black */
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color) !important; /* from: focus:ring-2 */
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+/* Styles for the input field inside the control. */
+.ts-control input::placeholder {
+  color: #9ca3af !important; /* from: placeholder:text-gray-400 */
+}
+.ts-control,
+.ts-control input {
+  color: #111827 !important; /* from: text-gray-900 */
+  font-size: 0.875rem !important; /* from: sm:text-sm */
+  line-height: 1.5rem !important; /* from: sm:leading-6 */
+}
+
+.ts-dropdown {
+  margin: 0;
+}

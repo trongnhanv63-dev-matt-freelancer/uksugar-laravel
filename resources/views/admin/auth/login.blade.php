@@ -1,112 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0"
-        />
-        <title>Login</title>
+<html
+  lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+  class="h-full"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Admin Login</title>
 
-        {{-- This directive includes the compiled CSS file from Vite --}}
-        @vite('resources/css/app.css')
-    </head>
-    <body class="bg-primary bg-opacity-70 font-sans antialiased text-text-main">
-        <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <div class="max-w-md w-full p-8 md:p-10 bg-white rounded-xl shadow-lg space-y-8">
-                <div>
-                    <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-secondary">
-                        Sign in to your account
-                    </h2>
-                </div>
-
-                {{-- Form now points to the 'admin.login' route and includes CSRF protection --}}
-                <form
-                    class="mt-8 space-y-6"
-                    action="{{ route('admin.login') }}"
-                    method="POST"
-                >
-                    {{-- CSRF Token: Essential for security in Laravel POST forms --}}
-                    @csrf
-
-                    <input
-                        type="hidden"
-                        name="remember"
-                        value="true"
-                    />
-                    <div class="space-y-4">
-                        <div>
-                            <label
-                                for="email-address"
-                                class="sr-only"
-                            >
-                                Email address
-                            </label>
-                            <input
-                                id="email-address"
-                                name="email"
-                                type="email"
-                                autocomplete="email"
-                                required
-                                class="relative block w-full appearance-none rounded-md border border-border-input bg-bg-input px-3 py-2.5 text-secondary placeholder-gray-500 focus:z-10 focus:border-accent focus:outline-none focus:ring-accent sm:text-sm"
-                                placeholder="Email address"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                for="password"
-                                class="sr-only"
-                            >
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autocomplete="current-password"
-                                required
-                                class="relative block w-full appearance-none rounded-md border border-border-input bg-bg-input px-3 py-2.5 text-secondary placeholder-gray-500 focus:z-10 focus:border-accent focus:outline-none focus:ring-accent sm:text-sm"
-                                placeholder="Password"
-                            />
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <input
-                                id="remember-me"
-                                name="remember-me"
-                                type="checkbox"
-                                class="h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
-                            />
-                            <label
-                                for="remember-me"
-                                class="ml-2 block text-sm text-text-main"
-                            >
-                                Remember me
-                            </label>
-                        </div>
-
-                        <div class="text-sm">
-                            <a
-                                href="#"
-                                class="font-medium text-accent hover:text-opacity-80"
-                            >
-                                Forgot your password?
-                            </a>
-                        </div>
-                    </div>
-
-                    <div>
-                        <button
-                            type="submit"
-                            class="group relative flex w-full justify-center rounded-md border border-transparent bg-primary py-2.5 px-4 text-sm font-semibold text-text-button hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
-                        >
-                            Sign in
-                        </button>
-                    </div>
-                </form>
-            </div>
+    {{-- Include Vite assets for Tailwind CSS --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+  </head>
+  <body class="antialiased bg-gray-100 dark:bg-gray-900 flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-md mx-auto">
+      {{-- Login Card --}}
+      <div class="bg-white dark:bg-black rounded-2xl shadow-xl p-8 sm:p-10">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold text-black dark:text-white">Admin Panel</h1>
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Please sign in to continue</p>
         </div>
-    </body>
+
+        <form
+          action="{{ route('admin.login') }}"
+          method="POST"
+          class="space-y-6"
+        >
+          @csrf
+
+          {{-- General Error Message Display --}}
+          @if ($errors->any())
+            <div
+              class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 p-4 rounded-md"
+              role="alert"
+            >
+              <p class="text-sm">{{ $errors->first() }}</p>
+            </div>
+          @endif
+
+          {{-- Email Input --}}
+          <div>
+            <label
+              for="email"
+              class="sr-only"
+            >
+              Email address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="off"
+              required
+              value="{{ old('email') }}"
+              placeholder="Email address"
+              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg placeholder-gray-500 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent transition-colors"
+            />
+          </div>
+
+          {{-- Password Input --}}
+          <div>
+            <label
+              for="password"
+              class="sr-only"
+            >
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              placeholder="Password"
+              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg placeholder-gray-500 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent transition-colors"
+            />
+          </div>
+
+          <div class="flex items-center justify-between flex-wrap gap-4">
+            {{-- Remember Me Checkbox --}}
+            <div class="flex items-center">
+              <input
+                id="remember"
+                name="remember"
+                type="checkbox"
+                class="h-4 w-4 text-black dark:text-white border-gray-300 dark:border-gray-600 rounded focus:ring-black dark:focus:ring-offset-gray-100 dark:focus:ring-offset-black"
+              />
+              <label
+                for="remember"
+                class="ml-2 block text-sm text-gray-700 dark:text-gray-300"
+              >
+                Remember me
+              </label>
+            </div>
+
+            {{-- Forgot Password Link --}}
+            <div class="text-sm">
+              <a
+                href="#"
+                class="font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+              >
+                Forgot password?
+              </a>
+            </div>
+          </div>
+
+          {{-- Submit Button --}}
+          <div>
+            <button
+              type="submit"
+              class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-black dark:text-black dark:bg-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black dark:focus:ring-white transition-opacity"
+            >
+              SIGN IN
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <p class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        © {{ date('Y') }} Moist Pixels. All rights reserved.
+      </p>
+    </div>
+  </body>
 </html>

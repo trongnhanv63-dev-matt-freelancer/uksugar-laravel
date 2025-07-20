@@ -1,94 +1,115 @@
-@extends('admin.layouts.app')
+<x-layouts.admin>
+  <x-slot:title>Dashboard</x-slot>
 
-@section('title', 'Dashboard')
+  <h1 class="text-2xl font-semibold text-gray-900 mb-6">Dashboard</h1>
 
-@section('content')
-    {{-- Page Header --}}
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-primary">Dashboard</h1>
-        <p class="mt-1 text-text-main">An overview of your application's data.</p>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-4 rounded-lg shadow flex justify-between items-center">
+      <span class="text-sm font-medium text-gray-500">VISITS TODAY: 0</span>
+      <button class="px-3 py-1 text-xs font-semibold text-white bg-black rounded hover:bg-gray-800">Reset</button>
+    </div>
+    <div class="bg-white p-4 rounded-lg shadow flex justify-between items-center">
+      <span class="text-sm font-medium text-gray-500">VISITS THIS WEEK: 0</span>
+    </div>
+    <div class="bg-white p-4 rounded-lg shadow flex justify-between items-center">
+      <span class="text-sm font-medium text-gray-500">ACTIVE GIRLS: 41</span>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-lg shadow">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="font-bold text-gray-700">GIRL EDIT</h2>
+        <button
+          class="flex items-center px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800"
+        >
+          Add A New Girl
+          <svg
+            class="w-4 h-4 ml-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            ></path>
+          </svg>
+        </button>
+      </div>
+      <select class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black">
+        <option>SELECT A GIRL</option>
+      </select>
     </div>
 
-    {{-- Stat Cards Grid --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-xl shadow-lg flex items-center justify-between">
-            <div>
-                <div class="text-sm font-medium text-gray-400">Total Users</div>
-                <div class="text-3xl font-bold text-primary">{{ $userCount }}</div>
-            </div>
-            <div class="bg-blue-100 p-3 rounded-full">
-                <svg
-                    class="h-6 w-6 text-blue-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-4.67c.12-.24.232-.483.336-.728M9 12.75a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                </svg>
-            </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-xl shadow-lg flex items-center justify-between">
-            <div>
-                <div class="text-sm font-medium text-gray-400">Total Roles</div>
-                <div class="text-3xl font-bold text-primary">{{ $roleCount }}</div>
-            </div>
-            <div class="bg-purple-100 p-3 rounded-full">
-                <svg
-                    class="h-6 w-6 text-accent"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"
-                    />
-                </svg>
-            </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-xl shadow-lg flex items-center justify-between">
-            <div>
-                <div class="text-sm font-medium text-gray-400">Total Permissions</div>
-                <div class="text-3xl font-bold text-primary">{{ $permissionCount }}</div>
-            </div>
-            <div class="bg-green-100 p-3 rounded-full">
-                <svg
-                    class="h-6 w-6 text-success"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                </svg>
-            </div>
-        </div>
+    <div class="bg-white p-6 rounded-lg shadow">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="font-bold text-gray-700">NOTES</h2>
+        <button
+          class="flex items-center px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800"
+        >
+          Add A New Note
+          <svg
+            class="w-4 h-4 ml-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            ></path>
+          </svg>
+        </button>
+      </div>
     </div>
-    <div class="mb-6">
-        <h2 class="text-xl font-semibold mb-2">DaisyUI Component Test</h2>
-        <div class="flex items-center gap-4">
-            <button class="btn">Default</button>
-            <button class="btn btn-primary">Primary Button</button>
-            <button class="btn btn-secondary">Secondary Button</button>
-            <button class="btn btn-accent">Accent Button</button>
-            <button class="btn btn-success">Success</button>
-            <button class="btn btn-error">Error</button>
-        </div>
+  </div>
+
+  <div class="bg-white p-6 rounded-lg shadow">
+    <h2 class="font-bold text-gray-700 mb-4">MOST POPULAR</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr>
+            <th class="pb-2 text-sm font-medium text-gray-400">#</th>
+            <th class="pb-2 text-sm font-medium text-gray-400">NAME</th>
+            <th class="pb-2 text-sm font-medium text-gray-400 text-right">CLICKS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @php
+            $popular = [
+              ['name' => 'Stacey Saran', 'clicks' => 74],
+              ['name' => 'Devon', 'clicks' => 67],
+              ['name' => 'Jess West', 'clicks' => 59],
+              ['name' => 'Jazz', 'clicks' => 48],
+              ['name' => 'Korrina', 'clicks' => 48],
+              ['name' => 'Victoria Summers', 'clicks' => 45],
+              ['name' => 'Yasmin', 'clicks' => 45],
+              ['name' => 'Crystal', 'clicks' => 41],
+              ['name' => 'Ashley', 'clicks' => 40],
+              ['name' => 'Evelyn', 'clicks' => 38],
+            ];
+          @endphp
+
+          @foreach ($popular as $index => $item)
+            <tr class="border-t border-gray-200">
+              <td class="py-3 text-gray-500">{{ $index + 1 }}.</td>
+              <td class="py-3 font-medium text-gray-800">{{ $item['name'] }}</td>
+              <td class="py-3 text-gray-500 text-right">{{ $item['clicks'] }}</td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
     </div>
-@endsection
+    <div class="flex justify-end mt-4">
+      <button class="px-4 py-2 text-sm font-semibold text-white bg-black rounded hover:bg-gray-800">Reset</button>
+    </div>
+  </div>
+</x-layouts.admin>

@@ -1,25 +1,28 @@
 {
-    // STEP 1: Associate .blade.php files with the 'blade' language identifier.
-    // This is the most critical fix to solve the formatter conflict.
-    "files.associations": {
-        "*.blade.php": "blade"
-    },
-    // STEP 2: Set Prettier as the default formatter for all file types.
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true,
-    // STEP 3: Define language-specific overrides.
-    // For files identified as 'php', VS Code will use php-cs-fixer.
-    "[php]": {
-        "editor.defaultFormatter": "junstyle.php-cs-fixer"
-    },
-    // For files identified as 'blade' (thanks to our rule in STEP 1),
-    // VS Code will use Prettier.
-    "[blade]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    // --- Configuration for the PHP CS Fixer extension ---
-    "php-cs-fixer.config": ".coding-standard/php-cs-fixer/.config-dist.php",
-    "prettier.configPath": ".coding-standard/prettier/.prettierrc.json",
-    // --- Excutable Path
-    "php-cs-fixer.executablePath": "${workspaceFolder}/vendor/bin/php-cs-fixer"
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  // STEP 1: Associate .blade.php files with the 'blade' language identifier.
+  // This is the most critical fix to solve the formatter conflict.
+  "files.associations": {
+    "*.blade.php": "blade"
+  },
+  // STEP 2: Set Prettier as the default formatter for all file types.
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  // STEP 3: Define language-specific overrides.
+  // For files identified as 'php', VS Code will use php-cs-fixer.
+  "[php]": {
+    "editor.defaultFormatter": "junstyle.php-cs-fixer"
+  },
+  // For files identified as 'blade' (thanks to our rule in STEP 1),
+  // VS Code will use Prettier.
+  "[blade]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  // --- Configuration for the PHP CS Fixer extension ---
+  "php-cs-fixer.config": ".coding-standard/php-cs-fixer/.config-dist.php",
+  "prettier.configPath": ".coding-standard/prettier/.prettierrc.json",
+  // --- Excutable Path
+  "php-cs-fixer.executablePath": "${workspaceFolder}/vendor/bin/php-cs-fixer"
 }

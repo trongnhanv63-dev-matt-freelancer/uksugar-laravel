@@ -1,11 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\Api\UserController as AdminApiUserController;
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
-use App\Http\Controllers\Admin\UserController;
-use Illuminate\Support\Facades\Route; // Import the middleware class
+use App\Http\Controllers\Admin\UserController; // Import the middleware class
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +54,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
+// --- THÊM VÀO ĐOẠN MÃ NÀY ---
+Route::middleware(['auth', 'verified']) // Đảm bảo người dùng đã đăng nhập
+    ->prefix('api/admin')             // Thêm tiền tố /api/admin cho tất cả các route bên trong
+    ->name('admin.api.')              // Thêm tiền tố tên route là admin.api.
+    ->group(function () {
+
+        // Route để lấy danh sách người dùng
+        Route::get('/users', [AdminApiUserController::class, 'index'])->name('users.index');
+
+    });
+// --- KẾT THÚC PHẦN THÊM VÀO ---
 
 //==========================================================================
 // PUBLIC ROUTES
