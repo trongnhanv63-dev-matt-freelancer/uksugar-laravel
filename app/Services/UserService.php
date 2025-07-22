@@ -41,10 +41,16 @@ class UserService
 
     /**
      * Get all active roles for the create/edit user forms.
+     * @param array<string> $except An array of role names to exclude.
      */
-    public function getRolesForForm(): Collection
+    public function getRolesForForm(array $except = []): Collection
     {
-        return $this->roleRepository->getAllActive();
+        $allActiveRoles = $this->roleRepository->getAllActive();
+        if (!empty($except)) {
+            return $allActiveRoles->reject(fn ($role) => in_array($role->name, $except));
+        }
+
+        return $allActiveRoles;
     }
 
     /**
@@ -60,7 +66,8 @@ class UserService
 
             // Sync roles if they are provided
             if (!empty($data['roles'])) {
-                $user->syncRoles($data['roles']);
+                $roleIds = array_map('intval', $data['roles']);
+                $user->syncRoles($roleIds);
             }
 
             return $user;
@@ -91,7 +98,11 @@ class UserService
 
             // Sync roles
             // The `syncRoles` method comes from the Spatie package.
-            $user->syncRoles($data['roles'] ?? []);
+            $roleIds = [];
+            if (!empty($data['roles'])) {
+                $roleIds = array_map('intval', $data['roles']);
+            }
+            $user->syncRoles($roleIds);
 
             return $user->fresh();
         });

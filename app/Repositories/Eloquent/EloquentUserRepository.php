@@ -77,7 +77,7 @@ class EloquentUserRepository implements UserRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getPaginatedUsers(array $filters = [], int $perPage = 20): LengthAwarePaginator
+    public function getPaginatedUsers(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
         $query = User::with('roles');
 

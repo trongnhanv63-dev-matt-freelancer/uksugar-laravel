@@ -38,7 +38,7 @@
           value="{{ old('name', $user->name ?? '') }}"
           required
           @if($isProtectedUser) disabled @endif
-          class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+          class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-purple-500 sm:text-sm sm:leading-6 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
         />
       </div>
     </div>
@@ -56,8 +56,9 @@
           id="username"
           value="{{ old('username', $user->username ?? '') }}"
           required
+          autocomplete="username"
           @if($isProtectedUser) disabled @endif
-          class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+          class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-purple-500 sm:text-sm sm:leading-6 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
         />
       </div>
     </div>
@@ -79,7 +80,7 @@
         value="{{ old('email', $user->email ?? '') }}"
         required
         @if($isProtectedUser) disabled @endif
-        class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+        class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-purple-500 sm:text-sm sm:leading-6 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
       />
     </div>
   </div>
@@ -120,8 +121,9 @@
         name="password"
         id="password"
         {{ ! $isEditMode ? 'required' : '' }}
+        autocomplete="{{ $isEditMode ? 'new-password' : 'current-password' }}"
         @if($isProtectedUser) disabled @endif
-        class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 disabled:cursor-not-allowed disabled:bg-gray-50"
+        class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-purple-500 sm:text-sm sm:leading-6 disabled:cursor-not-allowed disabled:bg-gray-50"
         placeholder="{{ $isEditMode ? 'Enter new password' : 'Enter password' }}"
       />
       <button
@@ -178,18 +180,18 @@
       Status
     </label>
     <div class="mt-2">
-      {{-- Thẻ select giờ đây cực kỳ đơn giản, chỉ có một id --}}
       <select
         id="status-select"
         name="status"
         @if($isProtectedUser) disabled @endif
       >
+        <option value="">Select a status</option>
         @foreach (App\Enums\UserStatus::cases() as $status)
           <option
             value="{{ $status->value }}"
             @selected(old('status', $isEditMode ? $user->status->value : 'active') == $status->value)
           >
-            {{ ucfirst(str_replace('_', ' ', $status->name)) }}
+            {{ Str::headline($status->name) }}
           </option>
         @endforeach
       </select>
@@ -199,7 +201,7 @@
   {{-- Improved UI for Role Selection --}}
   <div class="pt-6 border-t border-gray-200">
     <h3 class="text-base font-semibold leading-6 text-gray-900">Assign Roles</h3>
-    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
       @foreach ($roles as $role)
         <div class="relative">
           <input
@@ -213,29 +215,37 @@
           />
           <label
             for="role_{{ $role->id }}"
-            class="block p-4 border rounded-lg cursor-pointer transition-all peer-checked:border-purple-500 peer-checked:ring-2 peer-checked:ring-purple-200 peer-disabled:cursor-not-allowed peer-disabled:bg-gray-100 peer-disabled:text-gray-500"
+            class="flex flex-col justify-between p-4 h-full border rounded-lg cursor-pointer transition-all peer-checked:border-purple-500 peer-checked:bg-purple-50 peer-disabled:cursor-not-allowed peer-disabled:bg-gray-100 peer-disabled:text-gray-500"
           >
-            <div class="flex items-center justify-between">
-              <span class="font-medium text-gray-900">{{ $role->name }}</span>
-              <svg
-                class="w-6 h-6 text-purple-600 opacity-0 peer-checked:opacity-100 transition-opacity"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.06 0l4-5.5z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </div>
+            <span class="font-semibold text-gray-900 peer-disabled:text-gray-500">{{ $role->name }}</span>
+            <p class="mt-2 text-sm text-gray-500 peer-disabled:text-gray-400">
+              {{ $role->description ?? 'No description provided.' }}
+            </p>
           </label>
+          <div
+            class="absolute top-2 right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-opacity"
+          >
+            <svg
+              class="w-3 h-3 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="3"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4.5 12.75l6 6 9-13.5"
+              />
+            </svg>
+          </div>
         </div>
       @endforeach
     </div>
   </div>
 </div>
+{{-- This is the correct closing tag for the main "space-y-6" div --}}
 
 <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-end gap-x-6">
   <a
@@ -253,12 +263,15 @@
   </button>
 </div>
 <script>
-  document.addEventListener('alpine:init', function () {
-    const el = document.getElementById('status-select');
-    if (el) {
-      new TomSelect(el, {
-        placeholder: 'Select a status...',
-      });
+  // This script remains safe because it doesn't depend on Alpine and uses a standard browser event.
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.TomSelect) {
+      const el = document.getElementById('status-select');
+      if (el && !el.disabled) {
+        new TomSelect(el, {
+          placeholder: 'Select a status',
+        });
+      }
     }
   });
 </script>

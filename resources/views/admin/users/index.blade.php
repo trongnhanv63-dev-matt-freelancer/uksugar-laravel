@@ -1,9 +1,19 @@
 <x-layouts.admin>
   <x-slot:title>User Management</x-slot>
 
+  @php
+    // Chuẩn bị dữ liệu ban đầu từ Controller để truyền cho JavaScript.
+    $initialData = [
+      'users' => $users->items(),
+      'pagination' => $users->toArray(),
+      'roles' => $roles,
+      'fetchUrl' => route('admin.api.users.index'),
+    ];
+  @endphp
+
   {{--
-    Chúng ta sẽ khởi tạo Alpine từ một thẻ <script> riêng biệt bên dưới.
-    x-data chỉ đơn giản là gọi component mà không truyền dữ liệu trực tiếp ở đây.
+    x-data chỉ gọi tên component.
+    Dữ liệu sẽ được khởi tạo an toàn trong thẻ <script> bên dưới.
   --}}
   <div x-data="userManagement">
     {{-- Page Header --}}
@@ -58,7 +68,6 @@
               />
             </svg>
           </div>
-          {{-- MODIFIED: Removed @input --}}
           <input
             x-model.debounce.500ms="search"
             type="text"
@@ -67,40 +76,39 @@
           />
         </div>
         <div>
-          {{-- MODIFIED: Removed @change --}}
-          <select
-            x-model="selectedRole"
-            class="w-full py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-black focus:border-black transition-colors"
-          >
-            <option value="">All Roles</option>
-            <template
-              x-for="role in roles"
-              :key="role.id"
+          <div wire:ignore>
+            <select
+              id="role-filter-select"
+              placeholder="All Roles"
             >
-              <option
-                :value="role.name"
-                x-text="role.name"
-              ></option>
-            </template>
-          </select>
+              <option value="">All Roles</option>
+              @foreach ($roles as $role)
+                <option value="{{ $role->name }}">{{ $role->name }}</option>
+              @endforeach
+            </select>
+          </div>
         </div>
         <div>
-          {{-- MODIFIED: Removed @change --}}
-          <select
-            x-model="selectedStatus"
-            class="w-full py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-black focus:border-black transition-colors"
-          >
-            <option value="">All Statuses</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="suspended">Suspended</option>
-          </select>
+          <div wire:ignore>
+            <select
+              id="status-filter-select"
+              placeholder="All Statuses"
+            >
+              <option value="">All Statuses</option>
+              @foreach (App\Enums\UserStatus::cases() as $status)
+                <option value="{{ $status->value }}">{{ Str::headline($status->name) }}</option>
+              @endforeach
+            </select>
+          </div>
         </div>
       </div>
     </div>
 
     {{-- Users Table --}}
-    <div class="bg-white shadow-md rounded-lg overflow-x-auto relative">
+    <div
+      class="bg-white shadow-md rounded-lg overflow-x-auto relative"
+      :class="{ 'min-h-[200px]': loading }"
+    >
       <div
         x-show="loading"
         x-transition
@@ -108,70 +116,81 @@
       >
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
       </div>
-      <table class="w-full text-sm text-left text-gray-500">
+      <table
+        class="w-full text-sm text-left text-gray-500 divide-y divide-gray-200"
+        x-show="!loading"
+      >
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th
               scope="col"
-              class="px-6 py-3 cursor-pointer"
+              class="px-6 py-3 cursor-pointer border-r border-gray-200"
               @click="handleSort('name')"
             >
-              <span class="flex items-center">
-                User
-                <svg
-                  x-show="sortBy === 'name'"
-                  class="w-3 h-3 ml-1.5"
-                  :class="sortDirection === 'asc' ? '' : 'rotate-180'"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="2"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </span>
+              <div class="flex items-center justify-between">
+                <span>User</span>
+                <span class="ml-2 flex flex-col">
+                  <svg
+                    class="w-2.5 h-2.5 -mb-0.5"
+                    :class="{ 'text-gray-900': sortBy === 'name' && sortDirection === 'asc', 'text-gray-400': sortBy !== 'name' || sortDirection !== 'asc' }"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 4l-8 8h16l-8-8z"></path>
+                  </svg>
+                  <svg
+                    class="w-2.5 h-2.5"
+                    :class="{ 'text-gray-900': sortBy === 'name' && sortDirection === 'desc', 'text-gray-400': sortBy !== 'name' || sortDirection !== 'desc' }"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 20l8-8H4l8 8z"></path>
+                  </svg>
+                </span>
+              </div>
             </th>
             <th
               scope="col"
-              class="px-6 py-3"
+              class="px-6 py-3 border-r border-gray-200"
             >
               Roles
             </th>
             <th
               scope="col"
-              class="px-6 py-3"
+              class="px-6 py-3 border-r border-gray-200"
             >
               Status
             </th>
             <th
               scope="col"
-              class="px-6 py-3 cursor-pointer"
+              class="px-6 py-3 cursor-pointer border-r border-gray-200"
               @click="handleSort('last_login_at')"
             >
-              <span class="flex items-center">
-                Last Login
-                <svg
-                  x-show="sortBy === 'last_login_at'"
-                  class="w-3 h-3 ml-1.5"
-                  :class="sortDirection === 'asc' ? '' : 'rotate-180'"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="2"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </span>
+              <div class="flex items-center justify-between">
+                <span>Last Login</span>
+                <span class="ml-2 flex flex-col">
+                  <svg
+                    class="w-2.5 h-2.5 -mb-0.5"
+                    :class="{ 'text-gray-900': sortBy === 'last_login_at' && sortDirection === 'asc', 'text-gray-400': sortBy !== 'last_login_at' || sortDirection !== 'asc' }"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 4l-8 8h16l-8-8z"></path>
+                  </svg>
+                  <svg
+                    class="w-2.5 h-2.5"
+                    :class="{ 'text-gray-900': sortBy === 'last_login_at' && sortDirection === 'desc', 'text-gray-400': sortBy !== 'last_login_at' || sortDirection !== 'desc' }"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 20l8-8H4l8 8z"></path>
+                  </svg>
+                </span>
+              </div>
             </th>
             <th
               scope="col"
@@ -181,7 +200,7 @@
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-gray-200">
           <template x-if="!loading && users.length === 0">
             <tr>
               <td
@@ -196,8 +215,8 @@
             x-for="user in users"
             :key="user.id"
           >
-            <tr class="bg-white border-b hover:bg-gray-50">
-              <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-r border-gray-200">
                 <div class="flex items-center">
                   <div class="flex-shrink-0 h-10 w-10">
                     <div
@@ -217,7 +236,7 @@
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4">
+              <td class="px-6 py-4 border-r border-gray-200">
                 <template x-if="user.roles.length > 0">
                   <div class="flex flex-wrap gap-1">
                     <template
@@ -232,7 +251,7 @@
                   </div>
                 </template>
               </td>
-              <td class="px-6 py-4">
+              <td class="px-6 py-4 border-r border-gray-200">
                 <span
                   class="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium"
                   :class="{ 'bg-green-100 text-green-700': user.status === 'active', 'bg-yellow-100 text-yellow-800': user.status === 'inactive', 'bg-red-100 text-red-800': user.status === 'suspended' }"
@@ -253,10 +272,10 @@
                 </span>
               </td>
               <td
-                class="px-6 py-4 text-sm text-gray-500"
+                class="px-6 py-4 text-sm text-gray-500 border-r border-gray-200"
                 x-text="user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Never'"
               ></td>
-              <td class="px-6 py-4 text-right">
+              <td class="px-6 py-4">
                 @can('users.edit')
                   <a
                     :href="`/admin/users/${user.id}/edit`"
@@ -281,14 +300,7 @@
   {{-- Script to safely initialize Alpine component with server-side data --}}
   <script>
     document.addEventListener('alpine:init', () => {
-      Alpine.data('userManagement', () =>
-        userManagement({
-          users: @json($users->items()),
-          pagination: @json($users->toArray()),
-          roles: @json($roles),
-          fetchUrl: @json(route('admin.api.users.index')),
-        })
-      );
+      Alpine.data('userManagement', () => userManagement(@json($initialData)));
     });
   </script>
 </x-layouts.admin>

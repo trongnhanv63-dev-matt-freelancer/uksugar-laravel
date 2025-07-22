@@ -28,17 +28,9 @@ class UserController extends Controller
      */
     public function index(): View
     {
-        // Fetch the initial set of users for the first page load.
         $users = $this->userService->getUsersForIndex([]);
-
-        // Fetch roles for the filter dropdown.
-        $roles = $this->userService->getRolesForForm();
-
-        // Return the Blade view with initial data.
-        return view('admin.users.index', [
-            'users' => $users,
-            'roles' => $roles,
-        ]);
+        $roles = $this->userService->getRolesForForm(except: ['super-admin']);
+        return view('admin.users.index', compact('users', 'roles'));
     }
 
     /**
@@ -69,7 +61,7 @@ class UserController extends Controller
      */
     public function edit(User $user): View
     {
-        $roles = $this->userService->getRolesForForm();
+        $roles = $this->userService->getRolesForForm(except: ['super-admin']);
         return view('admin.users.edit', compact('user', 'roles'));
     }
 

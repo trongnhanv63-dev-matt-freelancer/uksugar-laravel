@@ -1,13 +1,10 @@
 export default function userManagement(initialData) {
   return {
-    // --- State Properties ---
     users: [],
     pagination: null,
     roles: [],
     fetchUrl: '',
     loading: false,
-
-    // --- Filter & Sort Properties ---
     search: '',
     selectedRole: '',
     selectedStatus: '',
@@ -32,19 +29,36 @@ export default function userManagement(initialData) {
       }
       this.users = initialData.users || [];
       this.pagination = initialData.pagination || null;
-      this.roles = initialData.roles || [];
       this.fetchUrl = initialData.fetchUrl || '';
 
       if (this.pagination && this.pagination.links) {
         this.pagination.links = this.cleanPaginationLinks(this.pagination.links);
       }
 
-      // --- THE FIX: Watch for changes in filters ---
+      this.initRoleFilter();
+      this.initStatusFilter();
+
       // Use a single watcher for all filter properties.
       // This is more efficient than multiple watchers.
       this.$watch('[search, selectedRole, selectedStatus]', () => {
         // When a filter changes, reset to page 1 and fetch data
         this.fetchData(1);
+      });
+    },
+
+    initRoleFilter() {
+      new TomSelect('#role-filter-select', {
+        onChange: (value) => {
+          this.selectedRole = value;
+        },
+      });
+    },
+
+    initStatusFilter() {
+      new TomSelect('#status-filter-select', {
+        onChange: (value) => {
+          this.selectedStatus = value;
+        },
       });
     },
 
@@ -67,10 +81,14 @@ export default function userManagement(initialData) {
         })
         .then((data) => {
           this.users = data.data;
+
+          // This is the crucial fix: we flatten the structure from the API
+          // to match the structure from the initial server render.
           this.pagination = {
-            ...data,
-            links: this.cleanPaginationLinks(data.links),
+            ...data.meta, // Spread the meta object to get top-level keys
+            links: this.cleanPaginationLinks(data.meta.links), // Use the links array from meta
           };
+
           this.loading = false;
         })
         .catch((error) => {

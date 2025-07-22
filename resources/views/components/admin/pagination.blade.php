@@ -1,8 +1,9 @@
 {{--
-  MODIFIED: Wrapped the entire <nav> element in a <template> tag
-  and moved the x-if directive to it. This resolves the Alpine warning.
+  MODIFIED: Changed x-if condition.
+  It now only checks if the 'pagination' object exists,
+  ensuring it always renders even for a single page.
 --}}
-<template x-if="pagination && pagination.last_page > 1">
+<template x-if="pagination">
   <nav
     role="navigation"
     aria-label="Pagination Navigation"
@@ -31,8 +32,8 @@
         </p>
       </div>
 
-      {{-- Page links --}}
-      <div>
+      {{-- Page links (only show if there's more than one page) --}}
+      <div x-show="pagination.last_page > 1">
         <span class="relative z-0 inline-flex shadow-sm rounded-md">
           <button
             @click="fetchData(pagination.current_page - 1)"
