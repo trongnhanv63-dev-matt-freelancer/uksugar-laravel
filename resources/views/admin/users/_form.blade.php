@@ -1,4 +1,8 @@
-@csrf
+@php
+  // This logic remains as it is specific to this form
+  $isEditMode = isset($user);
+  $isProtectedUser = $isEditMode && $user->hasRole('super-admin');
+@endphp
 
 {{-- Display validation errors --}}
 @if ($errors->any())
@@ -15,77 +19,38 @@
   </div>
 @endif
 
-@php
-  $isEditMode = isset($user);
-  $isProtectedUser = $isEditMode && $user->hasRole('super-admin');
-@endphp
-
 <div class="space-y-6">
-  {{-- Name & Username --}}
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div>
-      <label
-        for="name"
-        class="block text-sm font-medium leading-6 text-gray-900"
-      >
-        Full Name
-      </label>
-      <div class="mt-2">
-        <input
-          type="text"
-          name="name"
-          id="name"
-          value="{{ old('name', $user->name ?? '') }}"
-          required
-          @if($isProtectedUser) disabled @endif
-          class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-purple-500 sm:text-sm sm:leading-6 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
-        />
-      </div>
-    </div>
-    <div>
-      <label
-        for="username"
-        class="block text-sm font-medium leading-6 text-gray-900"
-      >
-        Username
-      </label>
-      <div class="mt-2">
-        <input
-          type="text"
-          name="username"
-          id="username"
-          value="{{ old('username', $user->username ?? '') }}"
-          required
-          autocomplete="username"
-          @if($isProtectedUser) disabled @endif
-          class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-purple-500 sm:text-sm sm:leading-6 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
-        />
-      </div>
-    </div>
+    {{-- Using the input component for Name and Username --}}
+    <x-admin.form.input
+      name="name"
+      label="Full Name"
+      :value="$user->name ?? ''"
+      :disabled="$isProtectedUser"
+      autocomplete="name"
+      required
+    />
+    <x-admin.form.input
+      name="username"
+      label="Username"
+      :value="$user->username ?? ''"
+      :disabled="$isEditMode"
+      autocomplete="username"
+      required
+    />
   </div>
 
-  {{-- Email --}}
-  <div>
-    <label
-      for="email"
-      class="block text-sm font-medium leading-6 text-gray-900"
-    >
-      Email Address
-    </label>
-    <div class="mt-2">
-      <input
-        type="email"
-        name="email"
-        id="email"
-        value="{{ old('email', $user->email ?? '') }}"
-        required
-        @if($isProtectedUser) disabled @endif
-        class="block w-full rounded-md border-0 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-purple-500 sm:text-sm sm:leading-6 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
-      />
-    </div>
-  </div>
+  <x-admin.form.input
+    name="email"
+    label="Email Address"
+    type="email"
+    :value="$user->email ?? ''"
+    :disabled="$isEditMode"
+    autocomplete="email"
+    required
+  />
 
-  {{-- Password with Visibility Toggle --}}
+  {{-- Password with Visibility Toggle (This logic is specific to the user form, so it remains here) --}}
   <div x-data="{
     type: 'password',
     showPasswordFields: {{ $isEditMode ? 'false' : 'true' }},
@@ -171,34 +136,24 @@
     </div>
   </div>
 
-  {{-- Searchable Select for Status --}}
-  <div>
-    <label
-      for="status-select"
-      class="block text-sm font-medium leading-6 text-gray-900"
-    >
-      Status
-    </label>
-    <div class="mt-2">
-      <select
-        id="status-select"
-        name="status"
-        @if($isProtectedUser) disabled @endif
+  {{-- Using the select component --}}
+  <x-admin.form.select
+    name="status"
+    id="status-select"
+    label="Status"
+    :disabled="$isProtectedUser"
+  >
+    @foreach (App\Enums\UserStatus::cases() as $status)
+      <option
+        value="{{ $status->value }}"
+        @selected(old('status', $isEditMode ? $user->status->value : 'active') == $status->value)
       >
-        <option value="">Select a status</option>
-        @foreach (App\Enums\UserStatus::cases() as $status)
-          <option
-            value="{{ $status->value }}"
-            @selected(old('status', $isEditMode ? $user->status->value : 'active') == $status->value)
-          >
-            {{ Str::headline($status->name) }}
-          </option>
-        @endforeach
-      </select>
-    </div>
-  </div>
+        {{ Str::headline($status->name) }}
+      </option>
+    @endforeach
+  </x-admin.form.select>
 
-  {{-- Improved UI for Role Selection --}}
+  {{-- Role Selection (This is specific to users, so it stays here) --}}
   <div class="pt-6 border-t border-gray-200">
     <h3 class="text-base font-semibold leading-6 text-gray-900">Assign Roles</h3>
     <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
@@ -245,31 +200,21 @@
     </div>
   </div>
 </div>
-{{-- This is the correct closing tag for the main "space-y-6" div --}}
 
-<div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-end gap-x-6">
-  <a
-    href="{{ route('admin.users.index') }}"
-    class="text-sm font-semibold leading-6 text-gray-900"
-  >
-    Cancel
-  </a>
-  <button
-    type="submit"
-    @if($isProtectedUser) disabled @endif
-    class="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:opacity-50 disabled:cursor-not-allowed"
-  >
-    {{ $submitButtonText ?? 'Save' }}
-  </button>
-</div>
+{{-- Using the actions component --}}
+<x-admin.form.actions
+  :cancelUrl="route('admin.users.index')"
+  :submitText="$submitButtonText ?? 'Save'"
+  :disabled="$isProtectedUser"
+/>
+
 <script>
-  // This script remains safe because it doesn't depend on Alpine and uses a standard browser event.
   document.addEventListener('DOMContentLoaded', function () {
     if (window.TomSelect) {
       const el = document.getElementById('status-select');
       if (el && !el.disabled) {
         new TomSelect(el, {
-          placeholder: 'Select a status',
+          placeholder: 'Select a status...',
         });
       }
     }

@@ -29,7 +29,7 @@ class UserController extends Controller
     public function index(): View
     {
         $users = $this->userService->getUsersForIndex([]);
-        $roles = $this->userService->getRolesForForm(except: ['super-admin']);
+        $roles = $this->userService->getRolesForForm();
         return view('admin.users.index', compact('users', 'roles'));
     }
 
@@ -38,7 +38,7 @@ class UserController extends Controller
      */
     public function create(): View
     {
-        $roles = $this->userService->getRolesForForm();
+        $roles = $this->userService->getRolesForForm(except: ['super-admin']);
         return view('admin.users.create', compact('roles'));
     }
 

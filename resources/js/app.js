@@ -5,11 +5,12 @@ import '../css/components/tom-select.css';
 
 import Alpine from 'alpinejs';
 import TomSelect from 'tom-select';
-import userManagement from './pages/admin/userManagement';
 
-// Gán vào window để file Blade có thể truy cập
-window.userManagement = userManagement;
+// Import logic cho component live-table
+import liveTable from './components/admin/liveTable';
+
 window.TomSelect = TomSelect;
+window.liveTable = liveTable;
 
 window.Alpine = Alpine;
 Alpine.start();
