@@ -7,9 +7,10 @@
   'apiUrl',
   'createUrl',
   'createPermission',
+  'editUrlTemplate' => '',
+  'stateKey' => 'liveTableState',
 ])
 
-{{-- x-data chỉ gọi tên component, không truyền dữ liệu --}}
 <div x-data="liveTable">
   {{-- Page Header --}}
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
@@ -20,7 +21,8 @@
     @can($createPermission)
       <div class="mt-4 sm:mt-0">
         <a
-          href="{{ $createUrl }}"
+          href="#"
+          @click.prevent="saveStateAndRedirect('{{ $createUrl }}')"
           class="inline-flex items-center justify-center px-4 py-2 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 shadow-sm transition-colors"
         >
           <svg
@@ -74,17 +76,15 @@
           </div>
         @elseif ($filter['type'] === 'select')
           <div>
-            <div wire:ignore>
-              <select
-                id="{{ $filter['id'] }}"
-                placeholder="{{ $filter['placeholder'] }}"
-              >
-                <option value="">{{ $filter['placeholder'] }}</option>
-                @foreach ($filter['options'] as $option)
-                  <option value="{{ $option['value'] }}">{{ $option['text'] }}</option>
-                @endforeach
-              </select>
-            </div>
+            <select
+              id="{{ $filter['id'] }}"
+              placeholder="{{ $filter['placeholder'] }}"
+            >
+              <option value="">{{ $filter['placeholder'] }}</option>
+              @foreach ($filter['options'] as $option)
+                <option value="{{ $option['value'] }}">{{ $option['text'] }}</option>
+              @endforeach
+            </select>
           </div>
         @endif
       @endforeach
@@ -94,19 +94,22 @@
   {{-- Table --}}
   <div
     class="bg-white shadow-md rounded-lg overflow-x-auto relative"
-    :class="{ 'min-h-[200px]': loading }"
+    :class="{ 'min-h-[300px]': loading }"
   >
     <div
       x-show="loading"
-      x-transition
-      class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10"
+      x-transition:enter="transition-opacity ease-out duration-300"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition-opacity ease-in duration-200"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+      class="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-10"
+      x-cloak
     >
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
     </div>
-    <table
-      class="w-full text-sm text-left text-gray-500 divide-y divide-gray-200"
-      x-show="!loading"
-    >
+    <table class="w-full text-sm text-left text-gray-500 divide-y divide-gray-200">
       <thead class="text-xs text-gray-700 uppercase bg-gray-50">
         <tr>
           @foreach ($columns as $column)
@@ -166,7 +169,7 @@
           x-for="item in items"
           :key="item.id"
         >
-          {{ $slot }}
+          {{ $row }}
         </template>
       </tbody>
     </table>
@@ -176,10 +179,6 @@
   <div class="mt-4"><x-admin.pagination /></div>
 </div>
 
-{{--
-  THE FIX: Initialize the component safely using the alpine:init event.
-  This is the robust pattern that avoids all syntax errors.
---}}
 <script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('liveTable', () =>
@@ -187,6 +186,8 @@
         initialData: @json($initialData),
         apiUrl: @json($apiUrl),
         filters: @json($filters),
+        stateKey: @json($stateKey),
+        editUrlTemplate: @json($editUrlTemplate),
         defaultSortBy: 'created_at',
         defaultSortDirection: 'desc',
       })

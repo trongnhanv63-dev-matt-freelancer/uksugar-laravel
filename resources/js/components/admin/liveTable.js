@@ -1,7 +1,3 @@
-/**
- * File: resources/js/components/admin/liveTable.js
- * A reusable Alpine.js component for a dynamic data table.
- */
 import TomSelect from 'tom-select';
 
 export default function liveTable(config) {
@@ -14,20 +10,49 @@ export default function liveTable(config) {
     filters: {},
     sortBy: config.defaultSortBy || 'created_at',
     sortDirection: config.defaultSortDirection || 'desc',
+    stateKey: config.stateKey || 'liveTableState',
 
     init() {
-      this.items = this.config.initialData.data || [];
-      this.pagination = this.config.initialData || null;
-      this.pagination.links = this.cleanPaginationLinks(this.pagination.links);
+      const savedState = sessionStorage.getItem(this.stateKey);
+
+      if (savedState) {
+        const state = JSON.parse(savedState);
+        this.search = state.search || '';
+        this.filters = state.filters || {};
+        this.sortBy = state.sortBy || config.defaultSortBy;
+        this.sortDirection = state.sortDirection || config.defaultSortDirection;
+        sessionStorage.removeItem(this.stateKey); // Xóa sau khi khôi phục
+        this.fetchData(state.page || 1); // Tải lại dữ liệu với trang đã lưu
+      } else {
+        this.items = this.config.initialData.data || [];
+        this.pagination = this.config.initialData || null;
+      }
+
+      if (this.pagination && this.pagination.links) {
+        this.pagination.links = this.cleanPaginationLinks(this.pagination.links);
+      }
+
       this.initSelectFilters();
 
       this.$watch(
         '[search, filters]',
         () => {
-          this.fetchData(1);
+          this.$nextTick(() => this.fetchData(1));
         },
         { deep: true }
       );
+    },
+
+    saveStateAndRedirect(url) {
+      const state = {
+        search: this.search,
+        filters: this.filters,
+        sortBy: this.sortBy,
+        sortDirection: this.sortDirection,
+        page: this.pagination ? this.pagination.current_page : 1,
+      };
+      sessionStorage.setItem(this.stateKey, JSON.stringify(state));
+      window.location.href = url;
     },
 
     initSelectFilters() {
@@ -35,8 +60,11 @@ export default function liveTable(config) {
         if (filter.type === 'select') {
           const el = document.getElementById(filter.id);
           if (el) {
-            this.filters[filter.key] = '';
+            if (typeof this.filters[filter.key] === 'undefined') {
+              this.filters[filter.key] = '';
+            }
             new TomSelect(el, {
+              items: [this.filters[filter.key]],
               onChange: (value) => {
                 this.filters[filter.key] = value;
               },
@@ -60,10 +88,12 @@ export default function liveTable(config) {
         .then((response) => response.json())
         .then((data) => {
           this.items = data.data;
-          this.pagination = {
-            ...data.meta,
-            links: this.cleanPaginationLinks(data.meta.links),
-          };
+          this.pagination = data.meta
+            ? {
+                ...data.meta,
+                links: this.cleanPaginationLinks(data.meta.links),
+              }
+            : null;
           this.loading = false;
         });
     },
