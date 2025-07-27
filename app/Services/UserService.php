@@ -105,6 +105,14 @@ class UserService
             }
             $user->syncRoles($roleIds);
 
+            $oldRoles = $user->getRoleNames();
+            activity()
+                ->performedOn($user) // Ghi log cho đối tượng user này
+                ->causedBy(auth()->user()) // Người thực hiện là user đang đăng nhập
+                ->withProperty('old', $oldRoles) // Lưu lại role cũ
+                ->withProperty('new', $user->fresh()->getRoleNames()) // Lấy role mới
+                ->log('User roles updated'); // Mô tả hành động
+
             return $user->fresh();
         });
     }

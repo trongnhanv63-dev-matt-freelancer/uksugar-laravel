@@ -98,6 +98,14 @@ class RoleService
 
             $role->syncPermissions($permissionIds);
 
+            $oldPermissions = $role->permissions->pluck('name');
+            activity()
+                ->performedOn($role)
+                ->causedBy(auth()->user())
+                ->withProperty('old', $oldPermissions)
+                ->withProperty('new', $role->fresh()->permissions->pluck('name'))
+                ->log('Role permissions updated');
+
             return $role->fresh();
         });
     }

@@ -5,6 +5,8 @@ namespace App\Models;
 // 1. Import the base Role model from the Spatie package
 
 use App\Enums\Status;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Models\Role as SpatieRole;
 
 /**
@@ -13,6 +15,7 @@ use Spatie\Permission\Models\Role as SpatieRole;
  */
 class Role extends SpatieRole
 {
+    use LogsActivity;
     // For now, this model can be empty. We are just establishing the inheritance.
     // In the future, you can add `use LogsActivity;` here.
 
@@ -26,5 +29,14 @@ class Role extends SpatieRole
         return [
             'status' => Status::class,
         ];
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'description', 'status', 'permissions'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $eventName) => "Role has been {$eventName}");
     }
 }
