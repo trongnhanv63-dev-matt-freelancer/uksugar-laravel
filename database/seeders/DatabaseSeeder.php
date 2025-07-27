@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -11,6 +12,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(UserSeeder::class);
+        // The order of seeders is important
+        $this->call([
+            // PermissionSeeder::class,
+            // RoleSeeder::class,
+            // SuperAdminSeeder::class,
+            AdminSeeder::class,
+            // Other seeders can be added here
+        ]);
     }
 }

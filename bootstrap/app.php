@@ -1,18 +1,37 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
-use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Configuration\Middleware; // Import the exception class
+use Illuminate\Http\Request; // Import the Request class
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+        ]);
+        $middleware->trustProxies(at: [
+            '*', // Tin tưởng tất cả các proxy
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->renderable(function (AuthenticationException $e, Request $request) {
+            // Check if the request is for an admin route
+            if ($request->is('admin/*')) {
+                // If so, redirect to the admin login page
+                return redirect()->guest(route('admin.login'));
+            }
+
+            // For all other unauthenticated requests, redirect to the public login page
+            return redirect()->guest(route('admin.login'));
+        });
     })->create();

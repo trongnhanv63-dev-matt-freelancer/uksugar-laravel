@@ -1,0 +1,68 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Permission;
+use App\Repositories\Contracts\PermissionRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use Throwable;
+
+/**
+ * Service class for handling Permission-related business logic.
+ */
+class PermissionService
+{
+    protected PermissionRepositoryInterface $permissionRepository;
+
+    public function __construct(PermissionRepositoryInterface $permissionRepository)
+    {
+        $this->permissionRepository = $permissionRepository;
+    }
+
+    /**
+     * Get all permissions for the index page.
+     */
+    public function getPermissionsForIndex(array $filters = []): LengthAwarePaginator
+    {
+        return $this->permissionRepository->getPaginatedPermissions($filters);
+    }
+
+    /**
+     * Create a new permission within a transaction.
+     * @throws Throwable
+     */
+    public function createNewPermission(array $data): Permission
+    {
+        return DB::transaction(function () use ($data) {
+            return $this->permissionRepository->create($data);
+        });
+    }
+
+    /**
+     * Update an existing permission within a transaction.
+     * @throws Throwable
+     */
+    public function updatePermission(int $permissionId, array $data): Permission
+    {
+        return DB::transaction(function () use ($permissionId, $data) {
+            $permission = $this->permissionRepository->findById($permissionId);
+            return $this->permissionRepository->update($permission, $data);
+        });
+    }
+
+    /**
+     * Toggle the status of a permission within a transaction.
+     * @throws Throwable
+     */
+    public function togglePermissionStatus(int $permissionId): Permission
+    {
+        return DB::transaction(function () use ($permissionId) {
+            $permission = $this->permissionRepository->findById($permissionId);
+
+            $newStatus = $permission->status === 'active' ? 'inactive' : 'active';
+
+            return $this->permissionRepository->update($permission, ['status' => $newStatus]);
+        });
+    }
+}
