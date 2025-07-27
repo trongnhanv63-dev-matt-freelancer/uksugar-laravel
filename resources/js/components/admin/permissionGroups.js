@@ -6,7 +6,9 @@ export default function permissionGroup(groupName, ids) {
       return `group_${this.groupName}`;
     },
     init() {
-      this.syncGroupCheckbox();
+      this.$nextTick(() => {
+        this.syncGroupCheckbox();
+      });
     },
     toggleGroup(event) {
       const checked = event.target.checked;
@@ -22,15 +24,18 @@ export default function permissionGroup(groupName, ids) {
       const groupCheckbox = document.getElementById(this.groupCheckboxId);
       if (!groupCheckbox) return;
 
-      const allChecked = this.ids.every((id) => {
-        const el = document.getElementById(`perm_${id}`);
-        return el && el.checked;
-      });
+      const enabledCheckboxes = this.ids
+        .map((id) => document.getElementById(`perm_${id}`))
+        .filter((el) => el && !el.disabled);
 
-      const noneChecked = this.ids.every((id) => {
-        const el = document.getElementById(`perm_${id}`);
-        return el && !el.checked;
-      });
+      if (enabledCheckboxes.length === 0) {
+        groupCheckbox.checked = false;
+        groupCheckbox.indeterminate = false;
+        return;
+      }
+
+      const allChecked = enabledCheckboxes.every((el) => el.checked);
+      const noneChecked = enabledCheckboxes.every((el) => !el.checked);
 
       if (allChecked) {
         groupCheckbox.indeterminate = false;
@@ -39,6 +44,7 @@ export default function permissionGroup(groupName, ids) {
         groupCheckbox.indeterminate = false;
         groupCheckbox.checked = false;
       } else {
+        groupCheckbox.checked = false;
         groupCheckbox.indeterminate = true;
       }
     },
