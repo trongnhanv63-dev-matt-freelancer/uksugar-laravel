@@ -21,8 +21,8 @@ export default function liveTable(config) {
         this.filters = state.filters || {};
         this.sortBy = state.sortBy || config.defaultSortBy;
         this.sortDirection = state.sortDirection || config.defaultSortDirection;
-        sessionStorage.removeItem(this.stateKey); // Xóa sau khi khôi phục
-        this.fetchData(state.page || 1); // Tải lại dữ liệu với trang đã lưu
+        sessionStorage.removeItem(this.stateKey);
+        this.fetchData(state.page || 1);
       } else {
         this.items = this.config.initialData.data || [];
         this.pagination = this.config.initialData || null;
@@ -58,7 +58,7 @@ export default function liveTable(config) {
     initSelectFilters() {
       this.config.filters.forEach((filter) => {
         if (filter.type === 'select') {
-          const el = document.getElementById(filter.id);
+          const el = this.$root.querySelector(`#${filter.id}`);
           if (el) {
             if (typeof this.filters[filter.key] === 'undefined') {
               this.filters[filter.key] = '';
@@ -94,6 +94,14 @@ export default function liveTable(config) {
                 links: this.cleanPaginationLinks(data.meta.links),
               }
             : null;
+        })
+        .catch((error) => {
+          console.error('There was a problem with the fetch operation:', error);
+          alert('Could not load data. Please try again later.');
+          this.items = [];
+          this.pagination = null;
+        })
+        .finally(() => {
           this.loading = false;
         });
     },

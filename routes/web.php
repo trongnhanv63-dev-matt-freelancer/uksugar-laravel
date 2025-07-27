@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\Api\UserController as AdminApiUserController;
+use App\Http\Controllers\Admin\Api\RoleController as AdminApiRoleController;
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PermissionController;
@@ -62,6 +63,9 @@ Route::middleware(['auth', 'verified']) // Đảm bảo người dùng đã đă
 
         // Route để lấy danh sách người dùng
         Route::get('/users', [AdminApiUserController::class, 'index'])->name('users.index');
+        
+        // Route để lấy danh sách roles
+        Route::get('/roles', [AdminApiRoleController::class, 'index'])->name('roles.index');
 
     });
 // --- KẾT THÚC PHẦN THÊM VÀO ---

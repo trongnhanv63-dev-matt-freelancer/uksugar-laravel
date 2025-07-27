@@ -26,11 +26,15 @@ class RoleService
     }
 
     /**
-     * Get all roles for the index page view.
+     * Get roles for the index page with filtering and pagination.
+     *
+     * @param array<string, mixed> $filters
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getRolesForIndex(): Collection
+    public function getRolesForIndex(array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        return $this->roleRepository->getAllWithPermissions();
+        // We can add more business logic here in the future if needed
+        return $this->roleRepository->getPaginatedRoles($filters);
     }
 
     /**
@@ -61,7 +65,8 @@ class RoleService
             // Sync permissions if they are provided
             if (!empty($data['permissions'])) {
                 // Use Spatie's method to sync permissions
-                $role->syncPermissions($data['permissions']);
+                $permissionIds = array_map('intval', $data['permissions']);
+                $role->syncPermissions($permissionIds);
             }
 
             return $role;
@@ -86,7 +91,12 @@ class RoleService
             $this->roleRepository->update($role, Arr::except($data, ['permissions']));
 
             // Use Spatie's method to sync permissions
-            $role->syncPermissions($data['permissions'] ?? []);
+            $permissionIds = [];
+            if (!empty($data['permissions'])) {
+                $permissionIds = array_map('intval', $data['permissions']);
+            }
+
+            $role->syncPermissions($permissionIds);
 
             return $role->fresh();
         });

@@ -1,136 +1,88 @@
-@extends('admin.layouts.app')
+<x-layouts.admin>
+  <x-slot:title>Role Management</x-slot>
 
-@section('title', 'Manage Roles')
-
-@section('content')
-    {{-- Page Header --}}
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Roles Management</h1>
-        <a
-            href="{{ route('admin.roles.create') }}"
-            class="mt-4 sm:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors duration-200"
-        >
-            Create New Role
-        </a>
-    </div>
-
-    {{-- Session Messages --}}
-    @if (session('success'))
-        <div
-            class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4"
-            role="alert"
-        >
-            <p>{{ session('success') }}</p>
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div
-            class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4"
-            role="alert"
-        >
-            <p>{{ session('error') }}</p>
-        </div>
-    @endif
-
-    {{-- Roles Table --}}
-    <div class="bg-white shadow-md rounded-lg overflow-x-auto">
-        <table class="w-full text-sm text-left text-gray-500">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                <tr>
-                    <th
-                        scope="col"
-                        class="px-6 py-3"
-                    >
-                        Role Name
-                    </th>
-                    <th
-                        scope="col"
-                        class="px-6 py-3"
-                    >
-                        Permissions Count
-                    </th>
-                    <th
-                        scope="col"
-                        class="px-6 py-3"
-                    >
-                        Status
-                    </th>
-                    <th
-                        scope="col"
-                        class="px-6 py-3"
-                    >
-                        Actions
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($roles as $role)
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                            {{ $role->name }}
-                            @if ($role->name === 'super-admin')
-                                <span title="Super Admin">⭐</span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full">
-                                {{ $role->permissions->count() }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4">
-                            @if ($role->status === 'active')
-                                <span
-                                    class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full"
-                                >
-                                    Active
-                                </span>
-                            @else
-                                <span
-                                    class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full"
-                                >
-                                    Inactive
-                                </span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-4 flex items-center space-x-4">
-                            @if ($role->name !== 'super-admin')
-                                <a
-                                    href="{{ route('admin.roles.edit', $role->id) }}"
-                                    class="font-medium text-indigo-600 hover:underline"
-                                >
-                                    Edit
-                                </a>
-                                <form
-                                    method="POST"
-                                    action="{{ route('admin.roles.toggleStatus', $role->id) }}"
-                                    onsubmit="return confirm('Are you sure you want to change this role\'s status?');"
-                                >
-                                    @csrf
-                                    @method('PATCH')
-                                    <button
-                                        type="submit"
-                                        class="font-medium hover:underline {{ $role->status === 'active' ? 'text-yellow-600' : 'text-green-600' }}"
-                                    >
-                                        {{ $role->status === 'active' ? 'Deactivate' : 'Activate' }}
-                                    </button>
-                                </form>
-                            @else
-                                <span class="text-gray-400">Protected</span>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr class="bg-white border-b">
-                        <td
-                            colspan="4"
-                            class="px-6 py-4 text-center text-gray-500"
-                        >
-                            No roles found.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-@endsection
+  <x-admin.live-table
+    type="roles"
+    :title="'Role Management'"
+    :description="'Manage system roles and their assigned permissions.'"
+    :initial-data="$roles->toArray()"
+    :api-url="route('admin.api.roles.index')"
+    :create-url="route('admin.roles.create')"
+    :create-permission="'roles.create'"
+    :edit-url-template="route('admin.roles.edit', ['role' => 'ITEM_ID'])"
+    state-key="roles_management"
+  >
+    <x-slot:row>
+      <tr class="hover:bg-gray-50">
+        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-r border-gray-200">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 h-10 w-10">
+              <div
+                class="h-10 w-10 rounded-full bg-purple-200 flex items-center justify-center font-bold text-purple-600"
+                x-text="item.name.charAt(0).toUpperCase()"
+              ></div>
+            </div>
+            <div class="ml-4">
+              <div class="text-base font-semibold text-gray-900">
+                <template x-if="item.name === 'super-admin'">
+                  <span class="text-yellow-500 mr-1">⭐</span>
+                </template>
+                <span x-text="item.name"></span>
+              </div>
+              <div
+                class="text-sm text-gray-500"
+                x-text="item.description || 'No description'"
+              ></div>
+            </div>
+          </div>
+        </td>
+        <td class="px-6 py-4 border-r border-gray-200">
+          <span
+            class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+            x-text="(item.permissions_count || 0) + ' permissions'"
+          ></span>
+        </td>
+        <td class="px-6 py-4 border-r border-gray-200">
+          <span
+            class="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium"
+            :class="{ 'bg-green-100 text-green-700': item.status === 'active', 'bg-red-100 text-red-800': item.status === 'inactive' }"
+          >
+            <svg
+              class="h-1.5 w-1.5"
+              viewBox="0 0 6 6"
+              :class="{ 'fill-green-500': item.status === 'active', 'fill-red-500': item.status === 'inactive'}"
+              aria-hidden="true"
+            >
+              <circle
+                cx="3"
+                cy="3"
+                r="3"
+              />
+            </svg>
+            <span x-text="item.status.charAt(0).toUpperCase() + item.status.slice(1)"></span>
+          </span>
+        </td>
+        <td
+          class="px-6 py-4 text-sm text-gray-500 border-r border-gray-200"
+          x-text="new Date(item.created_at).toLocaleDateString()"
+        ></td>
+        <td class="px-6 py-4">
+          @can('roles.edit')
+            <template x-if="item.name !== 'super-admin'">
+              <a
+                :href="config.editUrlTemplate.replace('ITEM_ID', item.id)"
+                @click.prevent="saveStateAndRedirect($el.href)"
+                class="text-indigo-600 hover:text-indigo-900 font-medium"
+              >
+                Edit
+              </a>
+            </template>
+            <template x-if="item.name === 'super-admin'">
+              <span class="text-gray-400 cursor-not-allowed">Protected</span>
+            </template>
+          @endcan
+        </td>
+      </tr>
+    </x-slot>
+  </x-admin.live-table>
+</x-layouts.admin>

@@ -86,7 +86,7 @@ class EloquentUserRepository implements UserRepositoryInterface
             $searchTerm = $filters['search'];
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', "%{$searchTerm}%")
-                    ->orWhere('email', 'like', "%{$searchTerm}%"); // MODIFIED: Search by email as well
+                    ->orWhere('email', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -96,13 +96,13 @@ class EloquentUserRepository implements UserRepositoryInterface
             $query->whereHas('roles', fn ($q) => $q->where('name', $roleName));
         }
 
-        // --- NEW: Apply status filter ---
+        // Apply status filter
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        // --- MODIFIED: Apply dynamic sorting ---
-        $sortBy = $filters['sort_by'] ?? 'created_at';
+        // Apply dynamic sorting
+        $sortBy = $filters['sort_by'] ?? 'id';
         $sortDirection = $filters['sort_direction'] ?? 'desc';
 
         // Prevent sorting by roles relationship to avoid errors
@@ -110,7 +110,7 @@ class EloquentUserRepository implements UserRepositoryInterface
             $query->orderBy($sortBy, $sortDirection);
         } else {
             // Default sort if trying to sort by a relationship
-            $query->orderBy('created_at', 'desc');
+            $query->orderBy('id', 'desc');
         }
 
         return $query->paginate($perPage);

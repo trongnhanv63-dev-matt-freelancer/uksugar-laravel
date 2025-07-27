@@ -203,8 +203,8 @@
 
 {{-- Using the actions component --}}
 <x-admin.form.actions
-  :cancelUrl="route('admin.users.index')"
-  :submitText="$submitButtonText ?? 'Save'"
+  :cancel-url="route('admin.users.index')"
+  :submit-button-text="$submitButtonText ?? 'Save'"
   :disabled="$isProtectedUser"
 />
 

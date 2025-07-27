@@ -62,7 +62,7 @@ class UserController extends Controller
     public function edit(User $user): View
     {
         if ($user->hasRole('super-admin')) {
-            abort(403, 'ACTION UNAUTHORIZED: The Super Admin user cannot be edited.');
+            abort(403, 'You are not authorized to perform this action. Please use your browser\'s back button to return.');
         }
 
         $roles = $this->userService->getRolesForForm(except: ['super-admin']);

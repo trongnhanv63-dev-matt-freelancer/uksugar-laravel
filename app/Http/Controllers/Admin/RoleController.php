@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Role\StoreRoleRequest;
 use App\Http\Requests\Admin\Role\UpdateRoleRequest;
+use App\Models\Role;
 use App\Services\RoleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use Spatie\Permission\Models\Role;
 use Throwable;
 
 class RoleController extends Controller
@@ -28,7 +28,7 @@ class RoleController extends Controller
      */
     public function index(): View
     {
-        $roles = $this->roleService->getRolesForIndex();
+        $roles = $this->roleService->getRolesForIndex([]);
         return view('admin.roles.index', compact('roles'));
     }
 
@@ -60,6 +60,9 @@ class RoleController extends Controller
      */
     public function edit(Role $role): View
     {
+        if ($role->name === 'super-admin') {
+            abort(403, 'You are not authorized to perform this action. Please use your browser\'s back button to return.');
+        }
         $permissions = $this->roleService->getPermissionsForForm();
         $rolePermissions = $role->permissions->pluck('id')->toArray();
         return view('admin.roles.edit', compact('role', 'permissions', 'rolePermissions'));

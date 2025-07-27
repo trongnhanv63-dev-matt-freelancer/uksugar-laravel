@@ -3,6 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\Role;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -44,4 +45,13 @@ interface RoleRepositoryInterface
      * @return \App\Models\Role
      */
     public function update(Role $role, array $attributes): Role;
+
+    /**
+     * Get a paginated list of roles with dynamic filtering, searching, and sorting.
+     *
+     * @param array<string, mixed> $filters
+     * @param int $perPage
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getPaginatedRoles(array $filters = [], int $perPage = 20): LengthAwarePaginator;
 }

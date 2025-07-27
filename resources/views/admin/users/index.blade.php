@@ -1,35 +1,16 @@
 <x-layouts.admin>
   <x-slot:title>User Management</x-slot>
 
-  @php
-    $columns = [['label' => 'User', 'key' => 'name', 'sortable' => true], ['label' => 'Roles', 'key' => 'roles', 'sortable' => false], ['label' => 'Status', 'key' => 'status', 'sortable' => false], ['label' => 'Last Login', 'key' => 'last_login_at', 'sortable' => true]];
-
-    $filters = [
-      ['type' => 'search', 'key' => 'search', 'placeholder' => 'Search by name or email...'],
-      ['type' => 'select', 'key' => 'role', 'id' => 'role-filter-select', 'placeholder' => 'All Roles', 'options' => $roles->map(fn ($r) => ['value' => $r->name, 'text' => $r->name])->all()],
-      [
-        'type' => 'select',
-        'key' => 'status',
-        'id' => 'status-filter-select',
-        'placeholder' => 'All Statuses',
-        'options' => collect(App\Enums\UserStatus::cases())
-          ->map(fn ($s) => ['value' => $s->value, 'text' => Str::headline($s->name)])
-          ->all(),
-      ],
-    ];
-  @endphp
-
   <x-admin.live-table
+    type="users"
     :title="'User Management'"
     :description="'Manage all system users, their roles, and statuses.'"
-    :columns="$columns"
-    :filters="$filters"
     :initial-data="$users->toArray()"
     :api-url="route('admin.api.users.index')"
     :create-url="route('admin.users.create')"
     :create-permission="'users.create'"
     :edit-url-template="route('admin.users.edit', ['user' => 'ITEM_ID'])"
-    :state-key="'users_management'"
+    state-key="users_management"
   >
     <x-slot:row>
       <tr class="hover:bg-gray-50">
