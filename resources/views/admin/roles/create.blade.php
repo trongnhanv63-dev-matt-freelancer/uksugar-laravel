@@ -7,6 +7,6 @@
       description="Define a new role and assign permissions to it."
     />
 
-    @include('admin.roles._form', ['submitButtonText' => 'Create Role'])
+    @include('admin.roles._form', ['submitButtonText' => 'Save'])
   </x-admin.form.card>
 </x-layouts.admin>

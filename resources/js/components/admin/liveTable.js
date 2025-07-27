@@ -11,21 +11,28 @@ export default function liveTable(config) {
     sortBy: config.defaultSortBy || 'created_at',
     sortDirection: config.defaultSortDirection || 'desc',
     stateKey: config.stateKey || 'liveTableState',
+    fetchController: null,
 
     init() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const shouldRestore = urlParams.get('restore_state') === 'true';
       const savedState = sessionStorage.getItem(this.stateKey);
 
-      if (savedState) {
+      if (shouldRestore && savedState) {
         const state = JSON.parse(savedState);
         this.search = state.search || '';
         this.filters = state.filters || {};
         this.sortBy = state.sortBy || config.defaultSortBy;
         this.sortDirection = state.sortDirection || config.defaultSortDirection;
-        sessionStorage.removeItem(this.stateKey);
         this.fetchData(state.page || 1);
+        history.replaceState(null, '', window.location.pathname);
       } else {
+        sessionStorage.removeItem(this.stateKey);
         this.items = this.config.initialData.data || [];
         this.pagination = this.config.initialData || null;
+        if (this.pagination) {
+          this.saveState();
+        }
       }
 
       if (this.pagination && this.pagination.links) {
@@ -35,7 +42,7 @@ export default function liveTable(config) {
       this.initSelectFilters();
 
       this.$watch(
-        '[search, filters]',
+        '[search, filters, sortBy, sortDirection]',
         () => {
           this.$nextTick(() => this.fetchData(1));
         },
@@ -43,7 +50,7 @@ export default function liveTable(config) {
       );
     },
 
-    saveStateAndRedirect(url) {
+    saveState() {
       const state = {
         search: this.search,
         filters: this.filters,
@@ -52,7 +59,6 @@ export default function liveTable(config) {
         page: this.pagination ? this.pagination.current_page : 1,
       };
       sessionStorage.setItem(this.stateKey, JSON.stringify(state));
-      window.location.href = url;
     },
 
     initSelectFilters() {
@@ -75,6 +81,12 @@ export default function liveTable(config) {
     },
 
     fetchData(page = 1) {
+      if (this.fetchController) {
+        this.fetchController.abort();
+      }
+      this.fetchController = new AbortController();
+      const signal = this.fetchController.signal;
+
       this.loading = true;
       const params = new URLSearchParams({
         page: page,
@@ -84,7 +96,7 @@ export default function liveTable(config) {
         ...this.filters,
       });
 
-      fetch(`${this.config.apiUrl}?${params}`)
+      fetch(`${this.config.apiUrl}?${params}`, { signal })
         .then((response) => response.json())
         .then((data) => {
           this.items = data.data;
@@ -94,14 +106,18 @@ export default function liveTable(config) {
                 links: this.cleanPaginationLinks(data.meta.links),
               }
             : null;
+          this.saveState();
+          this.loading = false;
         })
         .catch((error) => {
+          if (error.name === 'AbortError') {
+            console.log('Fetch aborted');
+            return;
+          }
           console.error('There was a problem with the fetch operation:', error);
           alert('Could not load data. Please try again later.');
           this.items = [];
           this.pagination = null;
-        })
-        .finally(() => {
           this.loading = false;
         });
     },

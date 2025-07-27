@@ -50,11 +50,16 @@
 .ts-control input::placeholder {
   color: #9ca3af !important; /* from: placeholder:text-gray-400 */
 }
+
 .ts-control,
 .ts-control input {
   color: #111827 !important; /* from: text-gray-900 */
   font-size: 0.875rem !important; /* from: sm:text-sm */
   line-height: 1.5rem !important; /* from: sm:leading-6 */
+}
+
+.ts-control > input {
+  min-width: auto;
 }
 
 .ts-dropdown {

@@ -173,7 +173,7 @@
             for="role_{{ $role->id }}"
             class="flex flex-col justify-between p-4 h-full border rounded-lg cursor-pointer transition-all peer-checked:border-purple-500 peer-checked:bg-purple-50 peer-disabled:cursor-not-allowed peer-disabled:bg-gray-100 peer-disabled:text-gray-500"
           >
-            <span class="font-semibold text-gray-900 peer-disabled:text-gray-500">{{ $role->name }}</span>
+            <span class="font-semibold text-gray-900 peer-disabled:text-gray-500 break-words">{{ $role->name }}</span>
             <p class="mt-2 text-sm text-gray-500 peer-disabled:text-gray-400">
               {{ $role->description ?? 'No description provided.' }}
             </p>

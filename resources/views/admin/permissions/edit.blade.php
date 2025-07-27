@@ -10,6 +10,6 @@
       description="Update the permission's details."
     />
 
-    @include('admin.permissions._form', ['permission' => $permission, 'submitButtonText' => 'Update Permission'])
+    @include('admin.permissions._form', ['permission' => $permission, 'submitButtonText' => 'Save'])
   </x-admin.form.card>
 </x-layouts.admin>

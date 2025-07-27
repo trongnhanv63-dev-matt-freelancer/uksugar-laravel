@@ -10,6 +10,11 @@
       content="width=device-width, initial-scale=1.0"
     />
     <title>{{ $title ?? 'Admin Dashboard' }} - Moist Pixels</title>
+    <link
+      rel="icon"
+      href="{{ asset('favicon.ico') }}"
+      type="image/x-icon"
+    />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
   </head>
   <body class="h-full font-sans antialiased text-gray-800">

@@ -6,10 +6,10 @@
 
 <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-end gap-x-6">
   <a
-    href="{{ $cancelUrl }}"
+    href="{{ $cancelUrl }}?restore_state=true"
     class="text-sm font-semibold leading-6 text-gray-900"
   >
-    Cancel
+    Back
   </a>
   <button
     type="submit"

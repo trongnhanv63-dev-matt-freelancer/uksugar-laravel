@@ -7,6 +7,6 @@
       description="Provide the user's details and assign roles."
     />
 
-    @include('admin.users._form', ['submitButtonText' => 'Create User'])
+    @include('admin.users._form', ['submitButtonText' => 'Save'])
   </x-admin.form.card>
 </x-layouts.admin>

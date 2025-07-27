@@ -78,7 +78,6 @@
             <template x-if="! item.roles.some((role) => role.name === 'super-admin')">
               <a
                 :href="config.editUrlTemplate.replace('ITEM_ID', item.id)"
-                @click.prevent="saveStateAndRedirect($el.href)"
                 class="font-medium text-purple-600 hover:text-purple-900"
               >
                 Edit

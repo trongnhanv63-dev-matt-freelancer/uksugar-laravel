@@ -10,6 +10,6 @@
       description="Update the role's details and assigned permissions."
     />
 
-    @include('admin.roles._form', ['role' => $role, 'submitButtonText' => 'Update Role'])
+    @include('admin.roles._form', ['role' => $role, 'submitButtonText' => 'Save'])
   </x-admin.form.card>
 </x-layouts.admin>

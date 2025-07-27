@@ -7,6 +7,6 @@
       description="Define a new system permission that can be assigned to roles."
     />
 
-    @include('admin.permissions._form', ['submitButtonText' => 'Create Permission'])
+    @include('admin.permissions._form', ['submitButtonText' => 'Save'])
   </x-admin.form.card>
 </x-layouts.admin>

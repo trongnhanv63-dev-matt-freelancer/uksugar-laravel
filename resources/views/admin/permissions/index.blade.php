@@ -59,7 +59,6 @@
           @can('permissions.edit')
             <a
               :href="config.editUrlTemplate.replace('ITEM_ID', item.id)"
-              @click.prevent="saveStateAndRedirect($el.href)"
               class="text-indigo-600 hover:text-indigo-900 font-medium"
             >
               Edit
