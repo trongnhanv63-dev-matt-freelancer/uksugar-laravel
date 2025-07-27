@@ -4,6 +4,7 @@
   $isProtectedUser = $isEditMode && $user->hasRole('super-admin');
 @endphp
 
+@csrf
 {{-- Display validation errors --}}
 @if ($errors->any())
   <div

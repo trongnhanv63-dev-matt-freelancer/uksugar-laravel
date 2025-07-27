@@ -18,6 +18,7 @@ class LiveTable extends Component
     private const CONFIGURATIONS = [
         'users' => 'configureForUsers',
         'roles' => 'configureForRoles',
+        'permissions' => 'configureForPermissions',
     ];
 
     /**
@@ -80,6 +81,27 @@ class LiveTable extends Component
 
         $this->filters = [
             ['type' => 'search', 'key' => 'search', 'placeholder' => 'Search by role name...'],
+            [
+                'type' => 'select', 'key' => 'status', 'id' => 'status-filter-select', 'placeholder' => 'All Statuses',
+                'options' => collect(BaseStatus::cases())->map(fn ($s) => ['value' => $s->value, 'text' => Str::headline($s->name)])->all(),
+            ],
+        ];
+    }
+
+    /**
+     * Configure the columns and filters for the Permissions table.
+     */
+    private function configureForPermissions(): void
+    {
+        $this->columns = [
+            ['label' => 'Permission Name', 'key' => 'name', 'sortable' => true],
+            ['label' => 'Description', 'key' => 'description', 'sortable' => false],
+            ['label' => 'Status', 'key' => 'status', 'sortable' => false],
+            ['label' => 'Created', 'key' => 'created_at', 'sortable' => true],
+        ];
+
+        $this->filters = [
+            ['type' => 'search', 'key' => 'search', 'placeholder' => 'Search by name or description...'],
             [
                 'type' => 'select', 'key' => 'status', 'id' => 'status-filter-select', 'placeholder' => 'All Statuses',
                 'options' => collect(BaseStatus::cases())->map(fn ($s) => ['value' => $s->value, 'text' => Str::headline($s->name)])->all(),

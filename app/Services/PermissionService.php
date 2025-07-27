@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Permission;
 use App\Repositories\Contracts\PermissionRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -23,9 +23,9 @@ class PermissionService
     /**
      * Get all permissions for the index page.
      */
-    public function getPermissionsForIndex(): Collection
+    public function getPermissionsForIndex(array $filters = []): LengthAwarePaginator
     {
-        return $this->permissionRepository->getAll();
+        return $this->permissionRepository->getPaginatedPermissions($filters);
     }
 
     /**

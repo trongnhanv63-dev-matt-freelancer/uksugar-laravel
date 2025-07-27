@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Permission; // Use your custom Permission model
 use App\Repositories\Contracts\PermissionRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -50,5 +51,35 @@ class EloquentPermissionRepository implements PermissionRepositoryInterface
     {
         $permission->update($attributes);
         return $permission;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaginatedPermissions(array $filters = [], int $perPage = 20): LengthAwarePaginator
+    {
+        $query = Permission::query();
+
+        // Apply search filter for name or description
+        if (!empty($filters['search'])) {
+            $searchTerm = $filters['search'];
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                    ->orWhere('description', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // Apply status filter
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        // Apply dynamic sorting
+        $sortBy = $filters['sort_by'] ?? 'id';
+        $sortDirection = $filters['sort_direction'] ?? 'desc';
+
+        $query->orderBy($sortBy, $sortDirection);
+
+        return $query->paginate($perPage);
     }
 }

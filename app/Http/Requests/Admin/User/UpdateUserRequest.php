@@ -17,8 +17,8 @@ class UpdateUserRequest extends FormRequest
         $userId = $this->route('user')->id;
         return [
             'name' => ['required', 'string', 'max:100'],
-            'username' => ['required', 'string', 'max:20', 'unique:users,username,' . $userId],
-            'email' => ['required', 'string', 'email', 'max:100', 'unique:users,email,' . $userId],
+            'username' => ['string', 'max:20', 'unique:users,username,' . $userId],
+            'email' => ['string', 'email', 'max:100', 'unique:users,email,' . $userId],
             'password' => ['nullable', 'string', Password::min(8)->symbols()->mixedCase()->numbers()->uncompromised()],
             'roles' => ['nullable', 'array'],
             'roles.*' => ['exists:roles,id'],

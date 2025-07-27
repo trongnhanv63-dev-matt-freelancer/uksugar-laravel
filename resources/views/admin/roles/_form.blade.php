@@ -1,9 +1,8 @@
-@csrf
-
 @php
   $isEditMode = isset($role);
 @endphp
 
+@csrf
 {{-- Display validation errors --}}
 @if ($errors->any())
   <div
@@ -90,7 +89,7 @@
           <div class="space-y-2">
             @foreach ($permissionList as $permission)
               @php
-                $permissionIsActive = $permission->status === 'active';
+                $permissionIsActive = $permission->status === App\Enums\Status::Active;
                 $isChecked = isset($rolePermissions) && in_array($permission->id, $rolePermissions);
               @endphp
 

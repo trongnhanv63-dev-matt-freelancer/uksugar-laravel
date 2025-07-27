@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
-import basicSsl from '@vitejs/plugin-basic-ssl'; // <-- THÊM DÒNG NÀY
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
@@ -12,13 +12,13 @@ export default defineConfig(({ mode }) => {
         refresh: true,
       }),
       tailwindcss(),
-      basicSsl(), // <-- THÊM DÒNG NÀY
+      basicSsl(),
     ],
     server: {
       host: '0.0.0.0',
       port: 5173,
       strictPort: true,
-      https: true, // <-- ĐỔI THÀNH TRUE
+      https: true,
     },
   };
 });

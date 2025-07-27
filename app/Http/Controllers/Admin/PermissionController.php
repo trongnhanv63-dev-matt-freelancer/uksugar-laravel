@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Permission\StorePermissionRequest;
 use App\Http\Requests\Admin\Permission\UpdatePermissionRequest;
+use App\Models\Permission;
 use App\Services\PermissionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use Spatie\Permission\Models\Permission;
 use Throwable;
 
 class PermissionController extends Controller

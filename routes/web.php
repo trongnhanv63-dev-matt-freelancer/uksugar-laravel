@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Admin\Api\UserController as AdminApiUserController;
+use App\Http\Controllers\Admin\Api\PermissionController as AdminApiPermissionController;
 use App\Http\Controllers\Admin\Api\RoleController as AdminApiRoleController;
+use App\Http\Controllers\Admin\Api\UserController as AdminApiUserController;
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PermissionController;
@@ -55,20 +56,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-// --- THÊM VÀO ĐOẠN MÃ NÀY ---
-Route::middleware(['auth', 'verified']) // Đảm bảo người dùng đã đăng nhập
-    ->prefix('api/admin')             // Thêm tiền tố /api/admin cho tất cả các route bên trong
-    ->name('admin.api.')              // Thêm tiền tố tên route là admin.api.
+Route::middleware(['auth', 'verified'])
+    ->prefix('api/admin')
+    ->name('admin.api.')
     ->group(function () {
-
-        // Route để lấy danh sách người dùng
         Route::get('/users', [AdminApiUserController::class, 'index'])->name('users.index');
-        
-        // Route để lấy danh sách roles
         Route::get('/roles', [AdminApiRoleController::class, 'index'])->name('roles.index');
-
+        Route::get('/permissions', [AdminApiPermissionController::class, 'index'])->name('permissions.index');
     });
-// --- KẾT THÚC PHẦN THÊM VÀO ---
 
 //==========================================================================
 // PUBLIC ROUTES
