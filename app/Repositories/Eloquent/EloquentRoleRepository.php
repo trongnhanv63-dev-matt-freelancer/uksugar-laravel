@@ -56,7 +56,7 @@ class EloquentRoleRepository implements RoleRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getPaginatedRoles(array $filters = [], int $perPage = 20): LengthAwarePaginator
+    public function getPaginatedRoles(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
         $query = Role::with('permissions')->withCount('permissions');
 

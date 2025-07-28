@@ -56,7 +56,7 @@ class EloquentPermissionRepository implements PermissionRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getPaginatedPermissions(array $filters = [], int $perPage = 20): LengthAwarePaginator
+    public function getPaginatedPermissions(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
         $query = Permission::query();
 
