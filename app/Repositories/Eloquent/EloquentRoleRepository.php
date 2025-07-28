@@ -61,30 +61,27 @@ class EloquentRoleRepository implements RoleRepositoryInterface
         $query = Role::with('permissions')->withCount('permissions');
 
         // Apply search filter for name or description
-        if (!empty($filters['search'])) {
-            $searchTerm = $filters['search'];
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'like', "%{$searchTerm}%")
-                    ->orWhere('description', 'like', "%{$searchTerm}%");
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
-        }
+        });
 
         // Apply status filter
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
+        $query->when($filters['status'] ?? null, function ($query, $status) {
+            $query->where('status', $status);
+        });
 
         // Apply dynamic sorting
         $sortBy = $filters['sort_by'] ?? 'id';
         $sortDirection = $filters['sort_direction'] ?? 'desc';
 
-        // Prevent sorting by permissions relationship to avoid errors
-        if ($sortBy !== 'permissions') {
-            $query->orderBy($sortBy, $sortDirection);
-        } else {
-            // Default sort if trying to sort by a relationship
-            $query->orderBy('id', 'desc');
+        if ($sortBy === 'permissions') {
+            $sortBy = 'permissions_count';
         }
+
+        $query->orderBy($sortBy, $sortDirection);
 
         return $query->paginate($perPage);
     }

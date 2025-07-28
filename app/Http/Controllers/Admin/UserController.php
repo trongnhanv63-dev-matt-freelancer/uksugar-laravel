@@ -7,12 +7,15 @@ use App\Http\Requests\Admin\User\StoreUserRequest;
 use App\Http\Requests\Admin\User\UpdateUserRequest;
 use App\Models\User;
 use App\Services\UserService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Throwable;
 
 class UserController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * The service for handling user business logic.
      */
@@ -61,9 +64,7 @@ class UserController extends Controller
      */
     public function edit(User $user): View
     {
-        if ($user->hasRole('super-admin')) {
-            abort(403, 'You are not authorized to perform this action. Please use your browser\'s back button to return.');
-        }
+        $this->authorize('update', $user);
 
         $roles = $this->userService->getRolesForForm(except: ['super-admin']);
         return view('admin.users.edit', compact('user', 'roles'));
@@ -75,11 +76,11 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
         try {
-            $this->userService->updateUser($user->id, $request->validated());
+            $this->userService->updateUser($user, $request->validated());
             return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
         } catch (Throwable $e) {
             report($e);
-            return back()->withInput()->with('error', $e->getMessage());
+            return back()->withInput()->with('error', 'There was an issue updating the user.');
         }
     }
 }

@@ -79,40 +79,43 @@ class EloquentUserRepository implements UserRepositoryInterface
      */
     public function getPaginatedUsers(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
-        $query = User::with('roles');
+        $query = $this->model->with('roles')->withCount('roles');
 
-        // Apply search filter for name or email
-        if (!empty($filters['search'])) {
-            $searchTerm = $filters['search'];
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'like', "%{$searchTerm}%")
-                    ->orWhere('email', 'like', "%{$searchTerm}%");
-            });
-        }
+        $this->applyFilters($query, $filters);
+        $this->applySorting($query, $filters);
 
-        // Apply role filter
-        if (!empty($filters['role'])) {
-            $roleName = $filters['role'];
-            $query->whereHas('roles', fn ($q) => $q->where('name', $roleName));
-        }
+        return $query->paginate($perPage);
+    }
 
-        // Apply status filter
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
+    /**
+     * Apply search, role, and status filters to the query.
+     */
+    private function applyFilters($query, array $filters): void
+    {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(fn ($q) => $q->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
+        })
+        ->when($filters['role'] ?? null, function ($query, $role) {
+            $query->whereHas('roles', fn ($q) => $q->where('name', $role));
+        })
+        ->when($filters['status'] ?? null, function ($query, $status) {
+            $query->where('status', $status);
+        });
+    }
 
-        // Apply dynamic sorting
+    /**
+     * Apply dynamic sorting to the query.
+     */
+    private function applySorting($query, array $filters): void
+    {
         $sortBy = $filters['sort_by'] ?? 'id';
         $sortDirection = $filters['sort_direction'] ?? 'desc';
 
-        // Prevent sorting by roles relationship to avoid errors
-        if ($sortBy !== 'roles') {
-            $query->orderBy($sortBy, $sortDirection);
-        } else {
-            // Default sort if trying to sort by a relationship
-            $query->orderBy('id', 'desc');
+        $sortableColumns = ['id', 'name', 'email', 'status', 'roles_count'];
+        if (! in_array($sortBy, $sortableColumns)) {
+            $sortBy = 'id';
         }
 
-        return $query->paginate($perPage);
+        $query->orderBy($sortBy, $sortDirection);
     }
 }

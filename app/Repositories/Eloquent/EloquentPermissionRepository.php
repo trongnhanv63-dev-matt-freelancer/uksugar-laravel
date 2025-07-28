@@ -61,18 +61,17 @@ class EloquentPermissionRepository implements PermissionRepositoryInterface
         $query = Permission::query();
 
         // Apply search filter for name or description
-        if (!empty($filters['search'])) {
-            $searchTerm = $filters['search'];
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'like', "%{$searchTerm}%")
-                    ->orWhere('description', 'like', "%{$searchTerm}%");
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
-        }
+        });
 
         // Apply status filter
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
+        $query->when($filters['status'] ?? null, function ($query, $status) {
+            $query->where('status', $status);
+        });
 
         // Apply dynamic sorting
         $sortBy = $filters['sort_by'] ?? 'id';

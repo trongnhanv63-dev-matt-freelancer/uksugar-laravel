@@ -46,11 +46,12 @@ class UserService
     public function getRolesForForm(array $except = []): Collection
     {
         $allActiveRoles = $this->roleRepository->getAllActive();
-        if (!empty($except)) {
-            return $allActiveRoles->reject(fn ($role) => in_array($role->name, $except));
+
+        if (empty($except)) {
+            return $allActiveRoles;
         }
 
-        return $allActiveRoles;
+        return $allActiveRoles->whereNotIn('name', $except);
     }
 
     /**
@@ -78,42 +79,43 @@ class UserService
      * Update an existing user and sync their roles within a transaction.
      * @throws Throwable
      */
-    public function updateUser(int $userId, array $data): User
+    public function updateUser(User $user, array $data): User
     {
-        return DB::transaction(function () use ($userId, $data) {
-            $user = $this->userRepository->findById($userId);
+        return DB::transaction(function () use ($user, $data) {
+            // If password field is empty or null, remove it from the data array.
+            $updateData = empty($data['password']) ? Arr::except($data, 'password') : $data;
 
-            // Business rule: Prevent modifying the super-admin user
-            if ($user->hasRole('super-admin')) {
-                throw new \Exception('The Super Admin user cannot be modified.');
-            }
+            // These fields are not meant to be updated from this form.
+            $updateData = Arr::except($updateData, ['roles', 'email', 'username']);
 
-            // If password field is empty, remove it from the data array
-            if (empty($data['password'])) {
-                unset($data['password']);
-            }
-
-            // Update user attributes
-            $updateData = Arr::except($data, ['roles', 'email', 'username']);
             $this->userRepository->update($user, $updateData);
 
-            // Sync roles
-            // The `syncRoles` method comes from the Spatie package.
-            $roleIds = [];
-            if (!empty($data['roles'])) {
-                $roleIds = array_map('intval', $data['roles']);
+            if (isset($data['roles'])) {
+                $this->syncRolesAndLog($user, $data['roles']);
             }
-            $user->syncRoles($roleIds);
-
-            $oldRoles = $user->getRoleNames();
-            activity()
-                ->performedOn($user) // Ghi log cho đối tượng user này
-                ->causedBy(auth()->user()) // Người thực hiện là user đang đăng nhập
-                ->withProperty('old', $oldRoles) // Lưu lại role cũ
-                ->withProperty('new', $user->fresh()->getRoleNames()) // Lấy role mới
-                ->log('User roles updated'); // Mô tả hành động
 
             return $user->fresh();
         });
+    }
+
+    /**
+     * Sync user roles and log the activity.
+     */
+    private function syncRolesAndLog(User $user, array $roles): void
+    {
+        $roleIds = array_map('intval', $roles);
+        $oldRoleNames = $user->roles->pluck('name');
+
+        $user->syncRoles($roleIds);
+        $newRoleNames = $user->fresh()->roles->pluck('name');
+
+        if ($oldRoleNames->diff($newRoleNames)->isNotEmpty() || $newRoleNames->diff($oldRoleNames)->isNotEmpty()) {
+            activity()
+                ->performedOn($user)
+                ->causedBy(auth()->user())
+                ->withProperty('old', $oldRoleNames->toArray())
+                ->withProperty('new', 'new', $newRoleNames->toArray())
+                ->log('User roles updated');
+        }
     }
 }
