@@ -68,7 +68,7 @@ class PermissionController extends Controller
     public function update(UpdatePermissionRequest $request, Permission $permission): RedirectResponse
     {
         try {
-            $this->permissionService->updatePermission($permission->id, $request->validated());
+            $this->permissionService->updatePermission($permission, $request->validated());
             return redirect()->route('admin.permissions.index')->with('success', 'Permission updated successfully.');
         } catch (Throwable $e) {
             report($e);
@@ -82,7 +82,7 @@ class PermissionController extends Controller
     public function toggleStatus(Permission $permission): RedirectResponse
     {
         try {
-            $this->permissionService->togglePermissionStatus($permission->id);
+            $this->permissionService->togglePermissionStatus($permission);
             return redirect()->route('admin.permissions.index')->with('success', 'Permission status updated successfully.');
         } catch (Throwable $e) {
             report($e);

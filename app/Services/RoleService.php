@@ -59,15 +59,17 @@ class RoleService
     public function createNewRole(array $data): Role
     {
         return DB::transaction(function () use ($data) {
-            // Create the role using only role attributes
-            $role = $this->roleRepository->create(Arr::except($data, ['permissions']));
+            $role = $this->roleRepository->create(Arr::except($data, 'permissions'));
 
-            // Sync permissions if they are provided
             if (!empty($data['permissions'])) {
-                // Use Spatie's method to sync permissions
                 $permissionIds = array_map('intval', $data['permissions']);
                 $role->syncPermissions($permissionIds);
             }
+
+            activity()
+                ->performedOn($role)
+                ->causedBy(auth()->user())
+                ->log('Role created');
 
             return $role;
         });
@@ -77,34 +79,17 @@ class RoleService
      * Update an existing role and sync its permissions within a transaction.
      * @throws Throwable
      */
-    public function updateExistingRole(int $roleId, array $data): Role
+    public function updateExistingRole(Role $role, array $data): Role
     {
-        return DB::transaction(function () use ($roleId, $data) {
-            $role = $this->roleRepository->findById($roleId);
+        if ($role->name === 'super-admin') {
+            throw new \Exception('The Super Admin role cannot be modified.');
+        }
 
-            // Business rule: Prevent modifying the super-admin role
-            if ($role->name === 'super-admin') {
-                throw new \Exception('The Super Admin role cannot be modified.');
-            }
+        return DB::transaction(function () use ($role, $data) {
+            $this->roleRepository->update($role, Arr::except($data, 'permissions'));
 
-            // Update the role's main attributes
-            $this->roleRepository->update($role, Arr::except($data, ['permissions']));
-
-            // Use Spatie's method to sync permissions
-            $permissionIds = [];
-            if (!empty($data['permissions'])) {
-                $permissionIds = array_map('intval', $data['permissions']);
-            }
-
-            $role->syncPermissions($permissionIds);
-
-            $oldPermissions = $role->permissions->pluck('name');
-            activity()
-                ->performedOn($role)
-                ->causedBy(auth()->user())
-                ->withProperty('old', $oldPermissions)
-                ->withProperty('new', $role->fresh()->permissions->pluck('name'))
-                ->log('Role permissions updated');
+            $permissionIds = array_map('intval', $data['permissions'] ?? []);
+            $this->syncPermissionsAndLog($role, $permissionIds);
 
             return $role->fresh();
         });
@@ -114,19 +99,42 @@ class RoleService
      * Toggle the status of a role within a transaction.
      * @throws Throwable
      */
-    public function toggleRoleStatus(int $roleId): Role
+    public function toggleRoleStatus(Role $role): Role
     {
-        return DB::transaction(function () use ($roleId) {
-            $role = $this->roleRepository->findById($roleId);
+        if ($role->name === 'super-admin') {
+            throw new \Exception('The Super Admin role status cannot be changed.');
+        }
 
-            // Business rule: Prevent changing super-admin status
-            if ($role->name === 'super-admin') {
-                throw new \Exception('The Super Admin role status cannot be changed.');
-            }
-
+        return DB::transaction(function () use ($role) {
             $newStatus = $role->status === 'active' ? 'inactive' : 'active';
+            $this->roleRepository->update($role, ['status' => $newStatus]);
 
-            return $this->roleRepository->update($role, ['status' => $newStatus]);
+            activity()
+                ->performedOn($role)
+                ->causedBy(auth()->user())
+                ->withProperty('status', $newStatus)
+                ->log('Role status updated');
+
+            return $role->fresh();
         });
+    }
+
+    /**
+     * Sync role permissions and log the activity.
+     */
+    private function syncPermissionsAndLog(Role $role, array $permissionIds): void
+    {
+        $oldPermissions = $role->permissions->pluck('name');
+        $role->syncPermissions($permissionIds);
+        $newPermissions = $role->fresh()->permissions->pluck('name');
+
+        if ($oldPermissions->diff($newPermissions)->isNotEmpty() || $newPermissions->diff($oldPermissions)->isNotEmpty()) {
+            activity()
+                ->performedOn($role)
+                ->causedBy(auth()->user())
+                ->withProperty('old', $oldPermissions->toArray())
+                ->withProperty('new', $newPermissions->toArray())
+                ->log('Role permissions updated');
+        }
     }
 }

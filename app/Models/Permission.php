@@ -5,8 +5,6 @@ namespace App\Models;
 // 1. Import the base Permission model from the Spatie package
 
 use App\Enums\Status;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Models\Permission as SpatiePermission;
 
 /**
@@ -14,8 +12,6 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
  */
 class Permission extends SpatiePermission
 {
-    use LogsActivity;
-
     /**
      * The attributes that should be cast.
      *
@@ -26,14 +22,5 @@ class Permission extends SpatiePermission
         return [
             'status' => Status::class,
         ];
-    }
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name', 'description', 'status'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn (string $eventName) => "Permission has been {$eventName}");
     }
 }

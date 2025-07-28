@@ -7,12 +7,15 @@ use App\Http\Requests\Admin\Role\StoreRoleRequest;
 use App\Http\Requests\Admin\Role\UpdateRoleRequest;
 use App\Models\Role;
 use App\Services\RoleService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Throwable;
 
 class RoleController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * The service for handling role business logic.
      */
@@ -73,8 +76,9 @@ class RoleController extends Controller
      */
     public function update(UpdateRoleRequest $request, Role $role): RedirectResponse
     {
+        $this->authorize('update', $role);
         try {
-            $this->roleService->updateExistingRole($role->id, $request->validated());
+            $this->roleService->updateExistingRole($role, $request->validated());
             return redirect()->route('admin.roles.index')->with('success', 'Role updated successfully.');
         } catch (Throwable $e) {
             report($e);
@@ -87,8 +91,9 @@ class RoleController extends Controller
      */
     public function toggleStatus(Role $role): RedirectResponse
     {
+        $this->authorize('update', $role);
         try {
-            $this->roleService->toggleRoleStatus($role->id);
+            $this->roleService->toggleRoleStatus($role);
             return redirect()->route('admin.roles.index')->with('success', 'Role status updated successfully.');
         } catch (Throwable $e) {
             report($e);

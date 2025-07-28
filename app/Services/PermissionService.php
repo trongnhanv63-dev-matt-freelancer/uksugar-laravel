@@ -35,7 +35,14 @@ class PermissionService
     public function createNewPermission(array $data): Permission
     {
         return DB::transaction(function () use ($data) {
-            return $this->permissionRepository->create($data);
+            $permission = $this->permissionRepository->create($data);
+
+            activity()
+                ->performedOn($permission)
+                ->causedBy(auth()->user())
+                ->log('Permission created');
+
+            return $permission;
         });
     }
 
@@ -43,11 +50,18 @@ class PermissionService
      * Update an existing permission within a transaction.
      * @throws Throwable
      */
-    public function updatePermission(int $permissionId, array $data): Permission
+    public function updatePermission(Permission $permission, array $data): Permission
     {
-        return DB::transaction(function () use ($permissionId, $data) {
-            $permission = $this->permissionRepository->findById($permissionId);
-            return $this->permissionRepository->update($permission, $data);
+        return DB::transaction(function () use ($permission, $data) {
+            $this->permissionRepository->update($permission, $data);
+
+            activity()
+                ->performedOn($permission)
+                ->causedBy(auth()->user())
+                ->withProperty('attributes', $data)
+                ->log('Permission updated');
+
+            return $permission->fresh();
         });
     }
 
@@ -55,14 +69,19 @@ class PermissionService
      * Toggle the status of a permission within a transaction.
      * @throws Throwable
      */
-    public function togglePermissionStatus(int $permissionId): Permission
+    public function togglePermissionStatus(Permission $permission): Permission
     {
-        return DB::transaction(function () use ($permissionId) {
-            $permission = $this->permissionRepository->findById($permissionId);
-
+        return DB::transaction(function () use ($permission) {
             $newStatus = $permission->status === 'active' ? 'inactive' : 'active';
+            $this->permissionRepository->update($permission, ['status' => $newStatus]);
 
-            return $this->permissionRepository->update($permission, ['status' => $newStatus]);
+            activity()
+                ->performedOn($permission)
+                ->causedBy(auth()->user())
+                ->withProperty('status', $newStatus)
+                ->log('Permission status updated');
+
+            return $permission->fresh();
         });
     }
 }

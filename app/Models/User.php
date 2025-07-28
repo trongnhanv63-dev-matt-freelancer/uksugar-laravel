@@ -8,8 +8,6 @@ use App\Enums\UserStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -17,7 +15,6 @@ class User extends Authenticatable
     use HasFactory;
     use Notifiable;
     use HasRoles;
-    use LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -56,14 +53,5 @@ class User extends Authenticatable
             'password' => 'hashed',
             'status' => UserStatus::class,
         ];
-    }
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name', 'email', 'status', 'roles']) // Chỉ ghi log cho các thuộc tính này
-            ->logOnlyDirty() // Chỉ ghi log khi dữ liệu thực sự thay đổi
-            ->dontSubmitEmptyLogs() // Không ghi log nếu không có gì thay đổi
-            ->setDescriptionForEvent(fn (string $eventName) => "User has been {$eventName}"); // Tùy chỉnh mô tả
     }
 }
